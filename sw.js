@@ -1,4 +1,4 @@
-const CACHE_NAME = "progress-v2";
+const CACHE_NAME = "progress-v3";
 
 const FILES_TO_CACHE = [
   "./",
