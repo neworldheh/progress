@@ -1,0 +1,25 @@
+{
+  "name": "Progress — Daily Evolution",
+  "short_name": "Progress",
+  "description": "Twój osobisty tracker postępów, zarobków, celów, notatek i cytatów.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08080c",
+  "theme_color": "#09090d",
+  "lang": "pl",
+  "categories": [
+    "productivity",
+    "lifestyle",
+    "finance"
+  ],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

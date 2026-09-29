@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#09090d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Progress">
+
+  <meta
+    name="description"
+    content="Twój osobisty tracker postępów, zarobków i celów."
+  >
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg">
+
+  <title>Progress</title>
+
+  <style>
+    :root {
+      --bg: #08080c;
+      --bg2: #0e0e15;
+      --card: rgba(255,255,255,.055);
+      --card-hover: rgba(255,255,255,.075);
+      --border: rgba(255,255,255,.09);
+
+      --text: #f5f5f7;
+      --muted: #90909c;
+
+      --purple: #9b5cff;
+      --pink: #ff4fd8;
+      --blue: #42b8ff;
+      --green: #5cffad;
+      --orange: #ffb45c;
+      --red: #ff5c75;
+
+      --radius: 24px;
+      --nav-height: 76px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      background: var(--bg);
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        system-ui,
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 10% 0%,
+          rgba(155,92,255,.15),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 90% 5%,
+          rgba(66,184,255,.10),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 50% 100%,
+          rgba(255,79,216,.08),
+          transparent 35%
+        ),
+        var(--bg);
+
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        16px
+        calc(var(--nav-height) + 30px + env(safe-area-inset-bottom));
+    }
+
+    /* ---------------- HEADER ---------------- */
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 2px 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+
+      display: grid;
+      place-items: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--pink) 55%,
+          var(--blue)
+        );
+
+      box-shadow:
+        0 0 30px rgba(155,92,255,.25);
+
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 750;
+      letter-spacing: -.4px;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 1px;
+    }
+
+    .date-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* ---------------- PAGES ---------------- */
+
+    .page {
+      display: none;
+      animation: pageIn .25s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes pageIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-title {
+      font-size: 30px;
+      line-height: 1;
+      margin: 8px 0 8px;
+      letter-spacing: -1.3px;
+    }
+
+    .page-description {
+      color: var(--muted);
+      margin: 0 0 22px;
+      font-size: 14px;
+    }
+
+    /* ---------------- CARDS ---------------- */
+
+    .card {
+      position: relative;
+      overflow: hidden;
+
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.065),
+          rgba(255,255,255,.025)
+        );
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.2);
+
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          circle at 100% 0%,
+          rgba(155,92,255,.08),
+          transparent 35%
+        );
+    }
+
+    .hero-card {
+      min-height: 190px;
+      padding: 24px;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      right: -80px;
+      top: -90px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,79,216,.32),
+          transparent 65%
+        );
+
+      filter: blur(10px);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px;
+    }
+
+    .big-money {
+      font-size: clamp(42px, 13vw, 64px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 1;
+      margin: 8px 0 18px;
+    }
+
+    .money-positive {
+      background:
+        linear-gradient(
+          90deg,
+          #fff,
+          #bba0ff 45%,
+          #ff8be8
+        );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .streak {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 8px 11px;
+      border-radius: 100px;
+
+      background: rgba(255,180,92,.09);
+      border: 1px solid rgba(255,180,92,.15);
+
+      color: #ffc783;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ---------------- BUTTONS ---------------- */
+
+    .primary-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+
+      min-height: 46px;
+      padding: 0 17px;
+
+      border-radius: 15px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--purple),
+          var(--pink)
+        );
+
+      box-shadow:
+        0 10px 30px rgba(155,92,255,.20);
+
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .primary-btn:active {
+      transform: scale(.97);
+    }
+
+    .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      min-height: 44px;
+      padding: 0 15px;
+
+      border-radius: 14px;
+
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+
+      color: var(--text);
+      font-weight: 650;
+      font-size: 13px;
+    }
+
+    .danger-btn {
+      background: rgba(255,92,117,.09);
+      color: #ff8093;
+      border: 1px solid rgba(255,92,117,.15);
+    }
+
+    /* ---------------- STATS ---------------- */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      padding: 17px;
+      border-radius: 20px;
+
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--border);
+    }
+
+    .stat-icon {
+      font-size: 20px;
+      margin-bottom: 13px;
+    }
+
+    .stat-value {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -.7px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    /* ---------------- PROGRESS ---------------- */
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+
+      margin: 28px 2px 12px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -.4px;
+    }
+
+    .section-heading span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .progress-track {
+      height: 9px;
+      overflow: hidden;
+
+      border-radius: 100px;
+      background: rgba(255,255,255,.07);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+
+      border-radius: inherit;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--purple),
+          var(--pink),
+          var(--blue)
+        );
+
+      box-shadow:
+        0 0 18px rgba(155,92,255,.35);
+
+      transition: width .5s ease;
+    }
+
+    .goal-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .goal-name {
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .goal-percent {
+      color: var(--purple);
+      font-weight: 800;
+    }
+
+    /* ---------------- FORMS ---------------- */
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      margin: 0 0 7px 3px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+
+      border: 1px solid var(--border);
+      outline: none;
+
+      border-radius: 15px;
+
+      padding: 13px 14px;
+
+      background: rgba(255,255,255,.045);
+      color: var(--text);
+
+      transition:
+        border .2s,
+        background .2s,
+        box-shadow .2s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(155,92,255,.65);
+
+      background: rgba(255,255,255,.065);
+
+      box-shadow:
+        0 0 0 4px rgba(155,92,255,.08);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #60606b;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ---------------- LISTS ---------------- */
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      padding: 14px;
+
+      border-radius: 18px;
+
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+    }
+
+    .list-item-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .list-item-title {
+      font-weight: 720;
+      font-size: 14px;
+      margin-bottom: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .list-item-meta {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .list-item-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 35px;
+      height: 35px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 11px;
+
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+
+      color: var(--muted);
+    }
+
+    .icon-btn:active {
+      transform: scale(.94);
+    }
+
+    .empty {
+      padding: 35px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    /* ---------------- HISTORY ---------------- */
+
+    .day-row {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+
+      padding: 13px 0;
+
+      border-bottom: 1px solid rgba(255,255,255,.055);
+    }
+
+    .day-row:last-child {
+      border-bottom: 0;
+    }
+
+    .day-date {
+      width: 42px;
+      height: 42px;
+
+      display: grid;
+      place-items: center;
+
+      flex-shrink: 0;
+
+      border-radius: 13px;
+
+      background: rgba(155,92,255,.10);
+      color: #c9a9ff;
+
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .day-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .day-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .day-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .day-money {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .day-note {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* ---------------- QUOTE ---------------- */
+
+    .quote-card {
+      padding: 23px;
+    }
+
+    .quote-mark {
+      font-size: 42px;
+      line-height: .7;
+      color: var(--purple);
+      opacity: .8;
+    }
+
+    .quote-text {
+      font-size: 19px;
+      line-height: 1.45;
+      font-weight: 650;
+      letter-spacing: -.3px;
+      margin: 15px 0;
+    }
+
+    .quote-author {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* ---------------- NAVIGATION ---------------- */
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 100;
+
+      left: 50%;
+      bottom: max(10px, env(safe-area-inset-bottom));
+
+      transform: translateX(-50%);
+
+      width: min(calc(100% - 24px), 600px);
+      height: var(--nav-height);
+
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+
+      padding: 7px;
+
+      border-radius: 25px;
+
+      background:
+        rgba(17,17,24,.82);
+
+      border: 1px solid rgba(255,255,255,.10);
+
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+
+      box-shadow:
+        0 15px 60px rgba(0,0,0,.45);
+    }
+
+    .nav-btn {
+      height: 62px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      gap: 4px;
+
+      border-radius: 19px;
+
+      background: transparent;
+      color: #6f6f7b;
+
+      font-size: 10px;
+      font-weight: 650;
+
+      transition: .2s;
+    }
+
+    .nav-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    .nav-btn.active {
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(155,92,255,.25),
+          rgba(255,79,216,.12)
+        );
+    }
+
+    /* ---------------- MODAL ---------------- */
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 200;
+
+      inset: 0;
+
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+
+      padding: 12px;
+
+      background: rgba(0,0,0,.60);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 620px);
+
+      max-height: calc(100dvh - 24px);
+
+      overflow-y: auto;
+
+      padding: 21px;
+
+      border-radius: 27px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #181820,
+          #101017
+        );
+
+      border: 1px solid rgba(255,255,255,.10);
+
+      box-shadow:
+        0 30px 100px rgba(0,0,0,.6);
+
+      animation: modalIn .25s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .close-btn {
+      width: 36px;
+      height: 36px;
+
+      border-radius: 50%;
+
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+
+      font-size: 18px;
+    }
+
+    /* ---------------- INSTALL ---------------- */
+
+    .install-banner {
+      display: none;
+
+      align-items: center;
+      gap: 12px;
+
+      padding: 14px;
+
+      margin-bottom: 14px;
+
+      border-radius: 19px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(155,92,255,.12),
+          rgba(255,79,216,.07)
+        );
+
+      border: 1px solid rgba(155,92,255,.20);
+    }
+
+    .install-banner.show {
+      display: flex;
+    }
+
+    .install-content {
+      flex: 1;
+    }
+
+    .install-title {
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .install-text {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .install-close {
+      color: var(--muted);
+      background: transparent;
+      padding: 5px;
+    }
+
+    /* ---------------- TOAST ---------------- */
+
+    .toast {
+      position: fixed;
+      z-index: 500;
+
+      left: 50%;
+      bottom: calc(var(--nav-height) + 25px);
+
+      transform:
+        translate(-50%, 15px);
+
+      opacity: 0;
+      pointer-events: none;
+
+      padding: 11px 15px;
+
+      border-radius: 13px;
+
+      background: #f5f5f7;
+      color: #09090d;
+
+      font-size: 12px;
+      font-weight: 750;
+
+      transition: .25s;
+
+      box-shadow:
+        0 10px 40px rgba(0,0,0,.35);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* ---------------- DESKTOP ---------------- */
+
+    @media (min-width: 700px) {
+      .app {
+        padding-top: 35px;
+      }
+
+      .bottom-nav {
+        bottom: 18px;
+      }
+
+      .modal-backdrop {
+        align-items: center;
+      }
+
+      .modal {
+        max-height: 90vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+
+        <div>
+          <div class="brand-name">Progress</div>
+          <div class="brand-subtitle">Your daily evolution</div>
+        </div>
+      </div>
+
+      <div class="date-label" id="headerDate"></div>
+    </header>
+
+    <!-- INSTALL -->
+
+    <div class="install-banner" id="installBanner">
+      <div style="font-size:24px;">📲</div>
+
+      <div class="install-content">
+        <div class="install-title">
+          Dodaj Progress do ekranu głównego
+        </div>
+
+        <div class="install-text">
+          Safari → Udostępnij → Dodaj do ekranu początkowego
+        </div>
+      </div>
+
+      <button
+        class="install-close"
+        onclick="closeInstallBanner()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- ================= HOME ================= -->
+
+    <section
+      class="page active"
+      id="page-home"
+    >
+
+      <h1 class="page-title">
+        Dzisiaj.
+      </h1>
+
+      <p class="page-description">
+        Mały krok każdego dnia.
+      </p>
+
+      <div class="card hero-card">
+
+        <div class="eyebrow">
+          Dzisiejszy zarobek
+        </div>
+
+        <div
+          class="big-money money-positive"
+          id="todayMoney"
+        >
+          0 zł
+        </div>
+
+        <div class="hero-bottom">
+
+          <div class="streak">
+            🔥 <span id="streakValue">0 dni</span>
+          </div>
+
+          <button
+            class="primary-btn"
+            onclick="openDayModal()"
+          >
+            + Dodaj dzień
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">◈</div>
+          <div
+            class="stat-value"
+            id="monthMoney"
+          >
+            0 zł
+          </div>
+          <div class="stat-label">
+            Ten miesiąc
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">↗</div>
+          <div
+            class="stat-value"
+            id="averageMoney"
+          >
+            0 zł
+          </div>
+          <div class="stat-label">
+            Średnio / dzień
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">★</div>
+          <div
+            class="stat-value"
+            id="bestDay"
+          >
+            0 zł
+          </div>
+          <div class="stat-label">
+            Najlepszy dzień
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">✓</div>
+          <div
+            class="stat-value"
+            id="daysCount"
+          >
+            0
+          </div>
+          <div class="stat-label">
+            Zapisanych dni
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-heading">
+        <h2>Aktualny cel</h2>
+        <span id="goalSmallLabel">—</span>
+      </div>
+
+      <div
+        class="card"
+        id="homeGoalCard"
+      ></div>
+
+      <div class="section-heading">
+        <h2>Ostatnie dni</h2>
+
+        <button
+          class="secondary-btn"
+          style="min-height:34px;padding:0 11px"
+          onclick="navigate('history')"
+        >
+          Wszystkie
+        </button>
+      </div>
+
+      <div
+        class="card"
+        id="recentDays"
+      ></div>
+
+      <div class="section-heading">
+        <h2>Myśl na dziś</h2>
+      </div>
+
+      <div
+        class="card quote-card"
+        id="homeQuote"
+      ></div>
+
+    </section>
+
+
+    <!-- ================= HISTORY ================= -->
+
+    <section
+      class="page"
+      id="page-history"
+    >
+
+      <h1 class="page-title">
+        Historia
+      </h1>
+
+      <p class="page-description">
+        Zobacz, jak wyglądała Twoja droga.
+      </p>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+
+          <div
+            class="stat-value"
+            id="historyTotal"
+          >
+            0 zł
+          </div>
+
+          <div class="stat-label">
+            Łącznie
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+
+          <div
+            class="stat-value"
+            id="historyDays"
+          >
+            0
+          </div>
+
+          <div class="stat-label">
+            Dni
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div
+          id="historyList"
+          class="list"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= GOALS ================= -->
+
+    <section
+      class="page"
+      id="page-goals"
+    >
+
+      <h1 class="page-title">
+        Cele
+      </h1>
+
+      <p class="page-description">
+        Miej przed oczami to, do czego zmierzasz.
+      </p>
+
+      <button
+        class="primary-btn"
+        style="width:100%; margin-bottom:15px"
+        onclick="openGoalModal()"
+      >
+        + Dodaj cel
+      </button>
+
+      <div
+        id="goalsList"
+        class="list"
+      ></div>
+
+    </section>
+
+
+    <!-- ================= NOTES ================= -->
+
+    <section
+      class="page"
+      id="page-notes"
+    >
+
+      <h1 class="page-title">
+        Notatki
+      </h1>
+
+      <p class="page-description">
+        Pomysły, refleksje, plany. Wszystko w jednym miejscu.
+      </p>
+
+      <button
+        class="primary-btn"
+        style="width:100%; margin-bottom:15px"
+        onclick="openNoteModal()"
+      >
+        + Nowa notatka
+      </button>
+
+      <div
+        id="notesList"
+        class="list"
+      ></div>
+
+      <div class="section-heading">
+        <h2>Twoje cytaty</h2>
+      </div>
+
+      <button
+        class="secondary-btn"
+        style="width:100%; margin-bottom:15px"
+        onclick="openQuoteModal()"
+      >
+        + Dodaj cytat
+      </button>
+
+      <div
+        id="quotesList"
+        class="list"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= NAVIGATION ================= -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-btn active"
+      data-page="home"
+      onclick="navigate('home')"
+    >
+      <span class="nav-icon">⌂</span>
+      <span>Start</span>
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="history"
+      onclick="navigate('history')"
+    >
+      <span class="nav-icon">◷</span>
+      <span>Historia</span>
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="goals"
+      onclick="navigate('goals')"
+    >
+      <span class="nav-icon">◎</span>
+      <span>Cele</span>
+    </button>
+
+    <button
+      class="nav-btn"
+      data-page="notes"
+      onclick="navigate('notes')"
+    >
+      <span class="nav-icon">✎</span>
+      <span>Notatki</span>
+    </button>
+
+  </nav>
+
+
+  <!-- ================= MODAL ================= -->
+
+  <div
+    class="modal-backdrop"
+    id="modalBackdrop"
+    onclick="backdropClick(event)"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <div
+          class="modal-title"
+          id="modalTitle"
+        >
+          Dodaj
+        </div>
+
+        <button
+          class="close-btn"
+          onclick="closeModal()"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div id="modalContent"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= TOAST ================= -->
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+<script>
+/* ============================================================
+   PROGRESS APP
+   ============================================================ */
+
+const STORAGE_KEY = "progress_app_v1";
+
+let state = {
+  days: [],
+  goals: [],
+  notes: [],
+  quotes: []
+};
+
+let currentPage = "home";
+let editingId = null;
+
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (saved) {
+      state = {
+        ...state,
+        ...JSON.parse(saved)
+      };
+    }
+  } catch (error) {
+    console.error("Nie udało się wczytać danych", error);
+  }
+}
+
+function saveState() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(state)
+  );
+}
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function uid() {
+  return Date.now().toString(36) +
+    Math.random().toString(36).substring(2);
+}
+
+function todayISO() {
+  const now = new Date();
+
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
+
+function formatMoney(value) {
+  return new Intl.NumberFormat("pl-PL", {
+    maximumFractionDigits: 2
+  }).format(Number(value) || 0) + " zł";
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString + "T12:00:00");
+
+  return new Intl.DateTimeFormat("pl-PL", {
+    day: "numeric",
+    month: "short"
+  }).format(date);
+}
+
+function formatFullDate(dateString) {
+  const date = new Date(dateString + "T12:00:00");
+
+  return new Intl.DateTimeFormat("pl-PL", {
+    weekday: "long",
+    day: "numeric",
+    month: "long"
+  }).format(date);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
+
+/* ============================================================
+   DATE
+   ============================================================ */
+
+function renderHeaderDate() {
+  const today = new Date();
+
+  document.getElementById("headerDate").innerHTML = `
+    ${new Intl.DateTimeFormat("pl-PL", {
+      weekday: "short"
+    }).format(today)}
+    <br>
+    ${new Intl.DateTimeFormat("pl-PL", {
+      day: "numeric",
+      month: "short"
+    }).format(today)}
+  `;
+}
+
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+function navigate(page) {
+  currentPage = page;
+
+  document.querySelectorAll(".page").forEach(element => {
+    element.classList.remove("active");
+  });
+
+  document
+    .getElementById(`page-${page}`)
+    .classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.page === page
+    );
+  });
+
+  renderAll();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* ============================================================
+   DAYS
+   ============================================================ */
+
+function getTodayEntry() {
+  return state.days.find(
+    day => day.date === todayISO()
+  );
+}
+
+function calculateTotal() {
+  return state.days.reduce(
+    (sum, day) => sum + Number(day.money || 0),
+    0
+  );
+}
+
+function calculateMonthTotal() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  return state.days
+    .filter(day => {
+      const date = new Date(day.date + "T12:00:00");
+
+      return (
+        date.getFullYear() === year &&
+        date.getMonth() === month
+      );
+    })
+    .reduce(
+      (sum, day) => sum + Number(day.money || 0),
+      0
+    );
+}
+
+function calculateAverage() {
+  if (!state.days.length) {
+    return 0;
+  }
+
+  return calculateTotal() / state.days.length;
+}
+
+function calculateBestDay() {
+  if (!state.days.length) {
+    return 0;
+  }
+
+  return Math.max(
+    ...state.days.map(day => Number(day.money || 0))
+  );
+}
+
+function calculateStreak() {
+  if (!state.days.length) {
+    return 0;
+  }
+
+  const dates = new Set(
+    state.days.map(day => day.date)
+  );
+
+  let streak = 0;
+
+  const current = new Date();
+
+  while (true) {
+    const y = current.getFullYear();
+    const m = String(current.getMonth() + 1).padStart(2, "0");
+    const d = String(current.getDate()).padStart(2, "0");
+
+    const key = `${y}-${m}-${d}`;
+
+    if (!dates.has(key)) {
+      break;
+    }
+
+    streak++;
+
+    current.setDate(
+      current.getDate() - 1
+    );
+  }
+
+  return streak;
+}
+
+
+/* ============================================================
+   HOME
+   ============================================================ */
+
+function renderHome() {
+  const today = getTodayEntry();
+
+  document.getElementById("todayMoney").textContent =
+    formatMoney(today ? today.money : 0);
+
+  document.getElementById("streakValue").textContent =
+    `${calculateStreak()} ${calculateStreak() === 1 ? "dzień" : "dni"}`;
+
+  document.getElementById("monthMoney").textContent =
+    formatMoney(calculateMonthTotal());
+
+  document.getElementById("averageMoney").textContent =
+    formatMoney(calculateAverage());
+
+  document.getElementById("bestDay").textContent =
+    formatMoney(calculateBestDay());
+
+  document.getElementById("daysCount").textContent =
+    state.days.length;
+
+  renderHomeGoal();
+  renderRecentDays();
+  renderHomeQuote();
+}
+
+function renderHomeGoal() {
+  const card = document.getElementById("homeGoalCard");
+
+  if (!state.goals.length) {
+    document.getElementById("goalSmallLabel").textContent = "Brak";
+
+    card.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">◎</div>
+        <div>Nie masz jeszcze celu.</div>
+
+        <button
+          class="secondary-btn"
+          style="margin-top:14px"
+          onclick="openGoalModal()"
+        >
+          Ustaw pierwszy cel
+        </button>
+      </div>
+    `;
+
+    return;
+  }
+
+  const goal = state.goals[0];
+
+  const current = Number(goal.current || 0);
+  const target = Number(goal.target || 0);
+
+  const percent = target > 0
+    ? Math.min(100, (current / target) * 100)
+    : 0;
+
+  document.getElementById("goalSmallLabel").textContent =
+    `${Math.round(percent)}%`;
+
+  card.innerHTML = `
+    <div class="goal-info">
+      <div>
+        <div class="goal-name">
+          ${escapeHTML(goal.name)}
+        </div>
+
+        <div
+          style="color:var(--muted);font-size:11px;margin-top:4px"
+        >
+          ${formatMoney(current)}
+          z
+          ${formatMoney(target)}
+        </div>
+      </div>
+
+      <div class="goal-percent">
+        ${Math.round(percent)}%
+      </div>
+    </div>
+
+    <div class="progress-track">
+      <div
+        class="progress-fill"
+        style="width:${percent}%"
+      ></div>
+    </div>
+
+    ${
+      goal.deadline
+        ? `
+          <div
+            style="
+              color:var(--muted);
+              font-size:11px;
+              margin-top:10px;
+            "
+          >
+            Termin: ${formatFullDate(goal.deadline)}
+          </div>
+        `
+        : ""
+    }
+  `;
+}
+
+function renderRecentDays() {
+  const container =
+    document.getElementById("recentDays");
+
+  const days = [...state.days]
+    .sort((a,b) => b.date.localeCompare(a.date))
+    .slice(0, 5);
+
+  if (!days.length) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">◷</div>
+        <div>Dodaj swój pierwszy dzień.</div>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = days.map(day => `
+    <div class="day-row">
+
+      <div class="day-date">
+        ${escapeHTML(formatDate(day.date))}
+      </div>
+
+      <div class="day-content">
+
+        <div class="day-main">
+
+          <div class="day-label">
+            ${escapeHTML(
+              day.date === todayISO()
+                ? "Dzisiaj"
+                : formatFullDate(day.date)
+            )}
+          </div>
+
+          <div class="day-money">
+            ${formatMoney(day.money)}
+          </div>
+
+        </div>
+
+        ${
+          day.note
+            ? `
+              <div class="day-note">
+                ${escapeHTML(day.note)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+  `).join("");
+}
+
+function renderHomeQuote() {
+  const container =
+    document.getElementById("homeQuote");
+
+  if (!state.quotes.length) {
+    container.innerHTML = `
+      <div class="quote-mark">“</div>
+
+      <div class="quote-text">
+        Nie musisz być lepszy od innych.
+        Wystarczy, że jesteś lepszy niż wczoraj.
+      </div>
+
+      <div class="quote-author">
+        — Twój Progress
+      </div>
+    `;
+
+    return;
+  }
+
+  const index =
+    new Date().getDate() %
+    state.quotes.length;
+
+  const quote = state.quotes[index];
+
+  container.innerHTML = `
+    <div class="quote-mark">“</div>
+
+    <div class="quote-text">
+      ${escapeHTML(quote.text)}
+    </div>
+
+    <div class="quote-author">
+      ${
+        quote.author
+          ? "— " + escapeHTML(quote.author)
+          : "— Twój cytat"
+      }
+    </div>
+  `;
+}
+
+
+/* ============================================================
+   DAY MODAL
+   ============================================================ */
+
+function openDayModal(date = todayISO()) {
+  const existing =
+    state.days.find(day => day.date === date);
+
+  editingId = existing ? existing.id : null;
+
+  openModal(
+    existing
+      ? "Edytuj dzień"
+      : "Dodaj dzień",
+    `
+      <form onsubmit="saveDay(event)">
+
+        <div class="form-group">
+          <label class="form-label">
+            Data
+          </label>
+
+          <input
+            id="dayDate"
+            type="date"
+            value="${date}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Ile zarobiłeś?
+          </label>
+
+          <input
+            id="dayMoney"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="np. 250"
+            value="${existing ? existing.money : ""}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Notatka
+          </label>
+
+          <textarea
+            id="dayNote"
+            placeholder="Co dzisiaj zrobiłeś? Jak Ci poszło?"
+          >${existing ? escapeHTML(existing.note || "") : ""}</textarea>
+        </div>
+
+        <button
+          class="primary-btn"
+          style="width:100%"
+          type="submit"
+        >
+          Zapisz dzień
+        </button>
+
+        ${
+          existing
+            ? `
+              <button
+                class="secondary-btn danger-btn"
+                style="width:100%;margin-top:9px"
+                type="button"
+                onclick="deleteDay('${existing.id}')"
+              >
+                Usuń dzień
+              </button>
+            `
+            : ""
+        }
+
+      </form>
+    `
+  );
+}
+
+function saveDay(event) {
+  event.preventDefault();
+
+  const date =
+    document.getElementById("dayDate").value;
+
+  const money =
+    Number(document.getElementById("dayMoney").value);
+
+  const note =
+    document.getElementById("dayNote").value.trim();
+
+  if (!date || Number.isNaN(money)) {
+    return;
+  }
+
+  const duplicate =
+    state.days.find(
+      day =>
+        day.date === date &&
+        day.id !== editingId
+    );
+
+  if (duplicate) {
+    showToast("Ten dzień już istnieje.");
+    return;
+  }
+
+  if (editingId) {
+    const index =
+      state.days.findIndex(
+        day => day.id === editingId
+      );
+
+    state.days[index] = {
+      ...state.days[index],
+      date,
+      money,
+      note
+    };
+
+  } else {
+
+    state.days.push({
+      id: uid(),
+      date,
+      money,
+      note
+    });
+
+  }
+
+  state.days.sort(
+    (a,b) => b.date.localeCompare(a.date)
+  );
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Dzień zapisany ✓");
+}
+
+function deleteDay(id) {
+  if (!confirm("Usunąć ten dzień?")) {
+    return;
+  }
+
+  state.days =
+    state.days.filter(day => day.id !== id);
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Dzień usunięty");
+}
+
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+
+function renderHistory() {
+  document.getElementById("historyTotal").textContent =
+    formatMoney(calculateTotal());
+
+  document.getElementById("historyDays").textContent =
+    state.days.length;
+
+  const container =
+    document.getElementById("historyList");
+
+  const days = [...state.days]
+    .sort((a,b) => b.date.localeCompare(a.date));
+
+  if (!days.length) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">◷</div>
+        Brak historii.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = days.map(day => `
+    <div class="day-row">
+
+      <div class="day-date">
+        ${escapeHTML(formatDate(day.date))}
+      </div>
+
+      <div class="day-content">
+
+        <div class="day-main">
+
+          <div class="day-label">
+            ${escapeHTML(formatFullDate(day.date))}
+          </div>
+
+          <div class="day-money">
+            ${formatMoney(day.money)}
+          </div>
+
+        </div>
+
+        ${
+          day.note
+            ? `
+              <div class="day-note">
+                ${escapeHTML(day.note)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+      <button
+        class="icon-btn"
+        onclick="openDayModal('${day.date}')"
+      >
+        ✎
+      </button>
+
+    </div>
+  `).join("");
+}
+
+
+/* ============================================================
+   GOALS
+   ============================================================ */
+
+function openGoalModal(id = null) {
+  const existing =
+    state.goals.find(goal => goal.id === id);
+
+  editingId = id;
+
+  openModal(
+    existing ? "Edytuj cel" : "Nowy cel",
+    `
+      <form onsubmit="saveGoal(event)">
+
+        <div class="form-group">
+          <label class="form-label">
+            Nazwa celu
+          </label>
+
+          <input
+            id="goalName"
+            type="text"
+            placeholder="np. 10 000 zł"
+            value="${existing ? escapeHTML(existing.name) : ""}"
+            required
+          >
+        </div>
+
+        <div class="row">
+
+          <div class="form-group">
+            <label class="form-label">
+              Aktualnie
+            </label>
+
+            <input
+              id="goalCurrent"
+              type="number"
+              step="0.01"
+              min="0"
+              value="${existing ? existing.current : 0}"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Cel
+            </label>
+
+            <input
+              id="goalTarget"
+              type="number"
+              step="0.01"
+              min="1"
+              placeholder="10000"
+              value="${existing ? existing.target : ""}"
+              required
+            >
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Termin — opcjonalnie
+          </label>
+
+          <input
+            id="goalDeadline"
+            type="date"
+            value="${existing ? existing.deadline || "" : ""}"
+          >
+        </div>
+
+        <button
+          class="primary-btn"
+          style="width:100%"
+          type="submit"
+        >
+          Zapisz cel
+        </button>
+
+        ${
+          existing
+            ? `
+              <button
+                class="secondary-btn danger-btn"
+                style="width:100%;margin-top:9px"
+                type="button"
+                onclick="deleteGoal('${existing.id}')"
+              >
+                Usuń cel
+              </button>
+            `
+            : ""
+        }
+
+      </form>
+    `
+  );
+}
+
+function saveGoal(event) {
+  event.preventDefault();
+
+  const name =
+    document.getElementById("goalName").value.trim();
+
+  const current =
+    Number(document.getElementById("goalCurrent").value);
+
+  const target =
+    Number(document.getElementById("goalTarget").value);
+
+  const deadline =
+    document.getElementById("goalDeadline").value;
+
+  if (!name || target <= 0) {
+    return;
+  }
+
+  if (editingId) {
+    const index =
+      state.goals.findIndex(
+        goal => goal.id === editingId
+      );
+
+    state.goals[index] = {
+      ...state.goals[index],
+      name,
+      current,
+      target,
+      deadline
+    };
+
+  } else {
+
+    state.goals.push({
+      id: uid(),
+      name,
+      current,
+      target,
+      deadline
+    });
+
+  }
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Cel zapisany ✓");
+}
+
+function deleteGoal(id) {
+  if (!confirm("Usunąć ten cel?")) {
+    return;
+  }
+
+  state.goals =
+    state.goals.filter(goal => goal.id !== id);
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Cel usunięty");
+}
+
+function renderGoals() {
+  const container =
+    document.getElementById("goalsList");
+
+  if (!state.goals.length) {
+    container.innerHTML = `
+      <div class="card">
+        <div class="empty">
+          <div class="empty-icon">◎</div>
+          Nie masz jeszcze żadnych celów.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = state.goals.map(goal => {
+
+    const current =
+      Number(goal.current || 0);
+
+    const target =
+      Number(goal.target || 0);
+
+    const percent =
+      target > 0
+        ? Math.min(100, current / target * 100)
+        : 0;
+
+    return `
+      <div class="card">
+
+        <div class="goal-info">
+
+          <div>
+            <div class="goal-name">
+              ${escapeHTML(goal.name)}
+            </div>
+
+            <div
+              style="
+                color:var(--muted);
+                font-size:11px;
+                margin-top:4px
+              "
+            >
+              ${formatMoney(current)}
+              / ${formatMoney(target)}
+            </div>
+          </div>
+
+          <div class="goal-percent">
+            ${Math.round(percent)}%
+          </div>
+
+        </div>
+
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            style="width:${percent}%"
+          ></div>
+        </div>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-top:14px;
+          "
+        >
+
+          <div
+            style="
+              color:var(--muted);
+              font-size:11px;
+            "
+          >
+            ${
+              goal.deadline
+                ? "Termin: " +
+                  escapeHTML(formatDate(goal.deadline))
+                : "Bez terminu"
+            }
+          </div>
+
+          <button
+            class="secondary-btn"
+            style="min-height:34px;padding:0 11px"
+            onclick="openGoalModal('${goal.id}')"
+          >
+            Edytuj
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+
+/* ============================================================
+   NOTES
+   ============================================================ */
+
+function openNoteModal(id = null) {
+  const existing =
+    state.notes.find(note => note.id === id);
+
+  editingId = id;
+
+  openModal(
+    existing ? "Edytuj notatkę" : "Nowa notatka",
+    `
+      <form onsubmit="saveNote(event)">
+
+        <div class="form-group">
+          <label class="form-label">
+            Tytuł
+          </label>
+
+          <input
+            id="noteTitle"
+            type="text"
+            placeholder="Np. Pomysł na jutro"
+            value="${existing ? escapeHTML(existing.title) : ""}"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Treść
+          </label>
+
+          <textarea
+            id="noteContent"
+            placeholder="Napisz tutaj..."
+            required
+          >${existing ? escapeHTML(existing.content) : ""}</textarea>
+        </div>
+
+        <button
+          class="primary-btn"
+          style="width:100%"
+          type="submit"
+        >
+          Zapisz notatkę
+        </button>
+
+        ${
+          existing
+            ? `
+              <button
+                class="secondary-btn danger-btn"
+                style="width:100%;margin-top:9px"
+                type="button"
+                onclick="deleteNote('${existing.id}')"
+              >
+                Usuń notatkę
+              </button>
+            `
+            : ""
+        }
+
+      </form>
+    `
+  );
+}
+
+function saveNote(event) {
+  event.preventDefault();
+
+  const title =
+    document.getElementById("noteTitle").value.trim();
+
+  const content =
+    document.getElementById("noteContent").value.trim();
+
+  if (!title || !content) {
+    return;
+  }
+
+  if (editingId) {
+
+    const index =
+      state.notes.findIndex(
+        note => note.id === editingId
+      );
+
+    state.notes[index] = {
+      ...state.notes[index],
+      title,
+      content
+    };
+
+  } else {
+
+    state.notes.unshift({
+      id: uid(),
+      title,
+      content,
+      createdAt: new Date().toISOString()
+    });
+
+  }
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Notatka zapisana ✓");
+}
+
+function deleteNote(id) {
+  if (!confirm("Usunąć notatkę?")) {
+    return;
+  }
+
+  state.notes =
+    state.notes.filter(note => note.id !== id);
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Notatka usunięta");
+}
+
+function renderNotes() {
+  const container =
+    document.getElementById("notesList");
+
+  if (!state.notes.length) {
+    container.innerHTML = `
+      <div class="card">
+        <div class="empty">
+          <div class="empty-icon">✎</div>
+          Brak notatek.
+        </div>
+      </div>
+    `;
+
+  } else {
+
+    container.innerHTML =
+      state.notes.map(note => `
+        <div class="list-item">
+
+          <div class="list-item-content">
+
+            <div class="list-item-title">
+              ${escapeHTML(note.title)}
+            </div>
+
+            <div
+              style="
+                color:#b8b8c2;
+                font-size:12px;
+                line-height:1.5;
+                margin-top:6px;
+                white-space:pre-wrap;
+              "
+            >
+              ${escapeHTML(note.content)}
+            </div>
+
+          </div>
+
+          <div class="list-item-actions">
+
+            <button
+              class="icon-btn"
+              onclick="openNoteModal('${note.id}')"
+            >
+              ✎
+            </button>
+
+          </div>
+
+        </div>
+      `).join("");
+  }
+
+  renderQuotes();
+}
+
+
+/* ============================================================
+   QUOTES
+   ============================================================ */
+
+function openQuoteModal(id = null) {
+  const existing =
+    state.quotes.find(quote => quote.id === id);
+
+  editingId = id;
+
+  openModal(
+    existing ? "Edytuj cytat" : "Nowy cytat",
+    `
+      <form onsubmit="saveQuote(event)">
+
+        <div class="form-group">
+          <label class="form-label">
+            Cytat
+          </label>
+
+          <textarea
+            id="quoteText"
+            placeholder="Wpisz swój cytat..."
+            required
+          >${existing ? escapeHTML(existing.text) : ""}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Autor — opcjonalnie
+          </label>
+
+          <input
+            id="quoteAuthor"
+            type="text"
+            placeholder="Np. Elon Musk"
+            value="${existing ? escapeHTML(existing.author || "") : ""}"
+          >
+        </div>
+
+        <button
+          class="primary-btn"
+          style="width:100%"
+          type="submit"
+        >
+          Zapisz cytat
+        </button>
+
+        ${
+          existing
+            ? `
+              <button
+                class="secondary-btn danger-btn"
+                style="width:100%;margin-top:9px"
+                type="button"
+                onclick="deleteQuote('${existing.id}')"
+              >
+                Usuń cytat
+              </button>
+            `
+            : ""
+        }
+
+      </form>
+    `
+  );
+}
+
+function saveQuote(event) {
+  event.preventDefault();
+
+  const text =
+    document.getElementById("quoteText").value.trim();
+
+  const author =
+    document.getElementById("quoteAuthor").value.trim();
+
+  if (!text) {
+    return;
+  }
+
+  if (editingId) {
+
+    const index =
+      state.quotes.findIndex(
+        quote => quote.id === editingId
+      );
+
+    state.quotes[index] = {
+      ...state.quotes[index],
+      text,
+      author
+    };
+
+  } else {
+
+    state.quotes.push({
+      id: uid(),
+      text,
+      author
+    });
+
+  }
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Cytat zapisany ✓");
+}
+
+function deleteQuote(id) {
+  if (!confirm("Usunąć cytat?")) {
+    return;
+  }
+
+  state.quotes =
+    state.quotes.filter(
+      quote => quote.id !== id
+    );
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Cytat usunięty");
+}
+
+function renderQuotes() {
+  const container =
+    document.getElementById("quotesList");
+
+  if (!state.quotes.length) {
+    container.innerHTML = `
+      <div class="card">
+        <div class="empty">
+          <div class="empty-icon">“</div>
+          Dodaj cytat, który chcesz widzieć.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    state.quotes.map(quote => `
+      <div class="list-item">
+
+        <div class="list-item-content">
+
+          <div
+            style="
+              font-size:13px;
+              line-height:1.5;
+              font-weight:650;
+            "
+          >
+            “${escapeHTML(quote.text)}”
+          </div>
+
+          ${
+            quote.author
+              ? `
+                <div class="list-item-meta">
+                  — ${escapeHTML(quote.author)}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+        <button
+          class="icon-btn"
+          onclick="openQuoteModal('${quote.id}')"
+        >
+          ✎
+        </button>
+
+      </div>
+    `).join("");
+}
+
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+function openModal(title, content) {
+  document.getElementById("modalTitle").textContent =
+    title;
+
+  document.getElementById("modalContent").innerHTML =
+    content;
+
+  document
+    .getElementById("modalBackdrop")
+    .classList.add("open");
+
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document
+    .getElementById("modalBackdrop")
+    .classList.remove("open");
+
+  document.body.style.overflow = "";
+
+  editingId = null;
+}
+
+function backdropClick(event) {
+  if (
+    event.target ===
+    document.getElementById("modalBackdrop")
+  ) {
+    closeModal();
+  }
+}
+
+
+/* ============================================================
+   INSTALL BANNER
+   ============================================================ */
+
+function closeInstallBanner() {
+  localStorage.setItem(
+    "progress_install_closed",
+    "1"
+  );
+
+  document
+    .getElementById("installBanner")
+    .classList.remove("show");
+}
+
+function setupInstallBanner() {
+  const isStandalone =
+    window.matchMedia(
+      "(display-mode: standalone)"
+    ).matches ||
+    window.navigator.standalone === true;
+
+  const closed =
+    localStorage.getItem(
+      "progress_install_closed"
+    );
+
+  const isIOS =
+    /iphone|ipad|ipod/i.test(
+      navigator.userAgent
+    );
+
+  if (
+    !isStandalone &&
+    isIOS &&
+    !closed
+  ) {
+    setTimeout(() => {
+      document
+        .getElementById("installBanner")
+        .classList.add("show");
+    }, 1500);
+  }
+}
+
+
+/* ============================================================
+   PWA
+   ============================================================ */
+
+function registerServiceWorker() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+
+      navigator.serviceWorker
+        .register("./sw.js")
+        .catch(error => {
+          console.log(
+            "Service Worker error:",
+            error
+          );
+        });
+
+    });
+  }
+}
+
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function renderAll() {
+  renderHome();
+  renderHistory();
+  renderGoals();
+  renderNotes();
+}
+
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+function init() {
+  loadState();
+
+  renderHeaderDate();
+  renderAll();
+
+  setupInstallBanner();
+  registerServiceWorker();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
