@@ -1842,17 +1842,29 @@
         </div>
 
         <div class="field">
-          <label>Zarobek</label>
-          <input
-            type="number"
-            id="dayMoney"
-            inputmode="decimal"
-            step="0.01"
-            min="0"
-            placeholder="np. 250"
-            value="${existing?.money ?? ""}"
-          />
-        </div>
+  <label>Zarobek / strata</label>
+  <input
+    type="number"
+    id="dayMoney"
+    inputmode="decimal"
+    step="0.01"
+    placeholder="np. 250 lub -150"
+    value="${existing?.money ?? ""}"
+  />
+</div>
+
+<div class="field">
+  <label>Odłożone na oszczędności</label>
+  <input
+    type="number"
+    id="daySaved"
+    inputmode="decimal"
+    step="0.01"
+    min="0"
+    placeholder="np. 100"
+    value="${existing?.saved ?? ""}"
+  />
+</div>
 
         <div class="field">
           <label>Notatka</label>
