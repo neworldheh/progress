@@ -1,48 +1,38 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#09090d">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Progress">
-
-  <meta
-    name="description"
-    content="Twój osobisty tracker postępów, zarobków i celów."
-  >
-
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icon.svg">
-
-  <title>Progress</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#09090d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Progress" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon.svg" />
+  <title>Progress — Daily Evolution</title>
 
   <style>
     :root {
       --bg: #08080c;
       --bg2: #0e0e15;
       --card: rgba(255,255,255,.055);
-      --card-hover: rgba(255,255,255,.075);
+      --card-strong: rgba(255,255,255,.075);
       --border: rgba(255,255,255,.09);
 
-      --text: #f5f5f7;
-      --muted: #90909c;
+      --text: #f7f7fb;
+      --muted: #9696a6;
+      --muted2: #686875;
 
       --purple: #9b5cff;
       --pink: #ff4fd8;
-      --blue: #42b8ff;
-      --green: #5cffad;
-      --orange: #ffb45c;
-      --red: #ff5c75;
+      --blue: #4c9cff;
+      --green: #39d98a;
+      --orange: #ff9b52;
+      --red: #ff5d73;
 
       --radius: 24px;
       --nav-height: 76px;
+      --shadow: 0 20px 60px rgba(0,0,0,.28);
     }
 
     * {
@@ -51,43 +41,26 @@
     }
 
     html {
+      min-height: 100%;
       background: var(--bg);
-      color-scheme: dark;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      min-height: 100dvh;
-
+      color: var(--text);
       font-family:
+        Inter,
         -apple-system,
         BlinkMacSystemFont,
         "SF Pro Display",
         "SF Pro Text",
-        Inter,
-        system-ui,
+        "Segoe UI",
         sans-serif;
-
       background:
-        radial-gradient(
-          circle at 10% 0%,
-          rgba(155,92,255,.15),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at 90% 5%,
-          rgba(66,184,255,.10),
-          transparent 25%
-        ),
-        radial-gradient(
-          circle at 50% 100%,
-          rgba(255,79,216,.08),
-          transparent 35%
-        ),
+        radial-gradient(circle at 15% 0%, rgba(155,92,255,.08), transparent 32%),
+        radial-gradient(circle at 100% 35%, rgba(76,156,255,.06), transparent 28%),
         var(--bg);
-
-      color: var(--text);
       overflow-x: hidden;
     }
 
@@ -99,666 +72,743 @@
 
     button {
       border: 0;
-      cursor: pointer;
       color: inherit;
     }
 
+    /* ---------- Ambient background ---------- */
+
+    .ambient {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 999px;
+      filter: blur(85px);
+      opacity: .13;
+      pointer-events: none;
+      z-index: -1;
+      will-change: transform;
+    }
+
+    .ambient.one {
+      top: -100px;
+      left: -80px;
+      background: #8b4dff;
+      animation: ambientFloatOne 18s ease-in-out infinite alternate;
+    }
+
+    .ambient.two {
+      top: 35%;
+      right: -120px;
+      background: #3d8cff;
+      animation: ambientFloatTwo 23s ease-in-out infinite alternate;
+    }
+
+    .ambient.three {
+      bottom: -130px;
+      left: 30%;
+      background: #ff3ccf;
+      opacity: .07;
+      animation: ambientFloatThree 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientFloatOne {
+      from {
+        transform: translate3d(0,0,0) scale(1);
+      }
+      to {
+        transform: translate3d(90px,110px,0) scale(1.18);
+      }
+    }
+
+    @keyframes ambientFloatTwo {
+      from {
+        transform: translate3d(0,0,0) scale(1);
+      }
+      to {
+        transform: translate3d(-100px,-70px,0) scale(1.2);
+      }
+    }
+
+    @keyframes ambientFloatThree {
+      from {
+        transform: translate3d(0,0,0);
+      }
+      to {
+        transform: translate3d(70px,-80px,0) scale(1.15);
+      }
+    }
+
+    /* ---------- App ---------- */
+
     .app {
-      width: 100%;
-      max-width: 760px;
+      width: min(100%, 760px);
+      min-height: 100vh;
       margin: 0 auto;
       padding:
         max(18px, env(safe-area-inset-top))
-        16px
+        18px
         calc(var(--nav-height) + 30px + env(safe-area-inset-bottom));
     }
-
-    /* ---------------- HEADER ---------------- */
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 2px 24px;
+      margin-bottom: 22px;
+      animation: fadeDown .5s ease both;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 13px;
-
-      display: grid;
-      place-items: center;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--purple),
-          var(--pink) 55%,
-          var(--blue)
-        );
-
-      box-shadow:
-        0 0 30px rgba(155,92,255,.25);
-
       font-size: 19px;
-      font-weight: 900;
+      font-weight: 800;
+      letter-spacing: -.04em;
     }
 
-    .brand-name {
-      font-size: 18px;
-      font-weight: 750;
-      letter-spacing: -.4px;
+    .brand-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--pink), var(--blue));
+      box-shadow:
+        0 0 15px rgba(155,92,255,.7),
+        0 0 28px rgba(255,79,216,.25);
+      animation: pulseDot 3s ease-in-out infinite;
     }
 
-    .brand-subtitle {
+    @keyframes pulseDot {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .top-date {
       color: var(--muted);
-      font-size: 11px;
-      margin-top: 1px;
+      font-size: 13px;
+      font-weight: 600;
     }
 
-    .date-label {
-      color: var(--muted);
-      font-size: 12px;
-      text-align: right;
-    }
-
-    /* ---------------- PAGES ---------------- */
+    /* ---------- Pages ---------- */
 
     .page {
       display: none;
-      animation: pageIn .25s ease;
     }
 
     .page.active {
       display: block;
+      animation: pageIn .38s cubic-bezier(.2,.8,.2,1) both;
     }
 
     @keyframes pageIn {
       from {
         opacity: 0;
-        transform: translateY(7px);
+        transform: translateY(8px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .page-title {
-      font-size: 30px;
-      line-height: 1;
-      margin: 8px 0 8px;
-      letter-spacing: -1.3px;
-    }
+    /* ---------- Typography ---------- */
 
-    .page-description {
+    .eyebrow {
       color: var(--muted);
-      margin: 0 0 22px;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .01em;
+      margin-bottom: 7px;
     }
 
-    /* ---------------- CARDS ---------------- */
+    .page-title {
+      margin: 0 0 22px;
+      font-size: clamp(31px, 8vw, 42px);
+      line-height: 1;
+      letter-spacing: -.055em;
+      font-weight: 850;
+    }
+
+    .section-title {
+      margin: 28px 0 12px;
+      font-size: 16px;
+      letter-spacing: -.02em;
+      font-weight: 800;
+    }
+
+    /* ---------- Cards ---------- */
 
     .card {
       position: relative;
-      overflow: hidden;
-
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-
-      background:
-        linear-gradient(
-          145deg,
-          rgba(255,255,255,.065),
-          rgba(255,255,255,.025)
-        );
-
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-
-      box-shadow:
-        0 20px 50px rgba(0,0,0,.2);
-
-      padding: 20px;
-      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      overflow: hidden;
+      animation: cardIn .55s cubic-bezier(.2,.8,.2,1) both;
     }
 
-    .card::before {
+    .card::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-
-      background:
-        radial-gradient(
-          circle at 100% 0%,
-          rgba(155,92,255,.08),
-          transparent 35%
-        );
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,.045),
+        transparent 35%
+      );
     }
 
-    .hero-card {
-      min-height: 190px;
-      padding: 24px;
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(13px) scale(.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    .hero-card::after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      right: -80px;
-      top: -90px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(255,79,216,.32),
-          transparent 65%
-        );
-
-      filter: blur(10px);
-      pointer-events: none;
+    .card.pressable {
+      transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
     }
 
-    .eyebrow {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin-bottom: 8px;
+    .card.pressable:active {
+      transform: scale(.985);
+      background: var(--card-strong);
     }
 
-    .big-money {
-      font-size: clamp(42px, 13vw, 64px);
-      font-weight: 800;
-      letter-spacing: -3px;
-      line-height: 1;
-      margin: 8px 0 18px;
+    /* ---------- Hero ---------- */
+
+    .hero {
+      padding: 25px;
+      min-height: 215px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .money-positive {
-      background:
-        linear-gradient(
-          90deg,
-          #fff,
-          #bba0ff 45%,
-          #ff8be8
-        );
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
 
+    .hero-money {
+      margin-top: 5px;
+      font-size: clamp(43px, 12vw, 65px);
+      line-height: .95;
+      letter-spacing: -.065em;
+      font-weight: 850;
+      background: linear-gradient(
+        110deg,
+        #fff 15%,
+        #d7c5ff 48%,
+        #ffb5f0 75%,
+        #a7cfff
+      );
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      min-height: 62px;
     }
 
-    .hero-bottom {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+    .hero-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
     }
 
     .streak {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffb15e;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .streak-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: rgba(255,155,82,.1);
+      box-shadow: inset 0 0 0 1px rgba(255,155,82,.08);
+    }
+
+    .hero-action {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .primary-btn {
+      position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #9b5cff, #7041df);
+      box-shadow:
+        0 8px 28px rgba(126,72,236,.3),
+        inset 0 1px 0 rgba(255,255,255,.18);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease;
+    }
 
-      padding: 8px 11px;
-      border-radius: 100px;
+    .primary-btn:hover {
+      box-shadow:
+        0 10px 34px rgba(126,72,236,.42),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    }
 
-      background: rgba(255,180,92,.09);
-      border: 1px solid rgba(255,180,92,.15);
+    .primary-btn:active {
+      transform: scale(.96);
+    }
 
-      color: #ffc783;
+    .plus {
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    /* ---------- Chart ---------- */
+
+    .chart-card {
+      margin-top: 14px;
+      padding: 20px 18px 15px;
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .chart-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .chart-total {
+      font-size: 25px;
+      font-weight: 850;
+      letter-spacing: -.045em;
+    }
+
+    .chart-change {
+      margin-top: 5px;
       font-size: 12px;
       font-weight: 700;
     }
 
-    /* ---------------- BUTTONS ---------------- */
-
-    .primary-btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-
-      min-height: 46px;
-      padding: 0 17px;
-
-      border-radius: 15px;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--purple),
-          var(--pink)
-        );
-
-      box-shadow:
-        0 10px 30px rgba(155,92,255,.20);
-
-      font-weight: 750;
-      font-size: 14px;
+    .chart-change.positive {
+      color: var(--green);
     }
 
-    .primary-btn:active {
-      transform: scale(.97);
+    .chart-change.negative {
+      color: var(--red);
     }
 
-    .secondary-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .chart-change.neutral {
+      color: var(--muted);
+    }
 
-      min-height: 44px;
-      padding: 0 15px;
+    .chart-toggle {
+      display: flex;
+      padding: 3px;
+      border-radius: 11px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.06);
+    }
 
-      border-radius: 14px;
+    .chart-toggle button {
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s ease;
+    }
 
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
+    .chart-toggle button.active {
+      color: white;
+      background: rgba(255,255,255,.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,.18);
+    }
 
-      color: var(--text);
-      font-weight: 650;
+    .chart-wrap {
+      position: relative;
+      height: 190px;
+      margin-top: 17px;
+    }
+
+    #earningsChart {
+      width: 100%;
+      height: 160px;
+      display: block;
+      touch-action: none;
+    }
+
+    .chart-labels {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted2);
+      font-size: 10px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      display: none;
+      min-width: 88px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: rgba(20,20,28,.88);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(15px);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .tooltip-date {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .tooltip-money {
+      margin-top: 2px;
       font-size: 13px;
+      font-weight: 850;
     }
 
-    .danger-btn {
-      background: rgba(255,92,117,.09);
-      color: #ff8093;
-      border: 1px solid rgba(255,92,117,.15);
-    }
-
-    /* ---------------- STATS ---------------- */
+    /* ---------- Stats ---------- */
 
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
+      margin-top: 14px;
     }
 
-    .stat-card {
+    .stat {
       padding: 17px;
-      border-radius: 20px;
-
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-    }
-
-    .stat-icon {
-      font-size: 20px;
-      margin-bottom: 13px;
-    }
-
-    .stat-value {
-      font-size: 23px;
-      font-weight: 800;
-      letter-spacing: -.7px;
+      min-height: 105px;
     }
 
     .stat-label {
       color: var(--muted);
       font-size: 11px;
-      margin-top: 4px;
+      font-weight: 700;
     }
 
-    /* ---------------- PROGRESS ---------------- */
+    .stat-value {
+      margin-top: 8px;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: -.045em;
+      font-weight: 850;
+    }
 
-    .section-heading {
+    /* ---------- Goal ---------- */
+
+    .goal-card {
+      padding: 19px;
+    }
+
+    .goal-head {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 10px;
-
-      margin: 28px 2px 12px;
+      gap: 15px;
     }
 
-    .section-heading h2 {
-      margin: 0;
-      font-size: 17px;
-      letter-spacing: -.4px;
+    .goal-name {
+      font-weight: 800;
+      font-size: 15px;
     }
 
-    .section-heading span {
-      color: var(--muted);
-      font-size: 12px;
+    .goal-percent {
+      font-weight: 850;
+      font-size: 14px;
+      color: #c9aaff;
     }
 
-    .progress-track {
-      height: 9px;
-      overflow: hidden;
-
-      border-radius: 100px;
+    .progress {
+      height: 8px;
+      margin-top: 16px;
+      border-radius: 999px;
       background: rgba(255,255,255,.07);
+      overflow: hidden;
     }
 
     .progress-fill {
       height: 100%;
       width: 0;
-
       border-radius: inherit;
-
-      background:
-        linear-gradient(
-          90deg,
-          var(--purple),
-          var(--pink),
-          var(--blue)
-        );
-
-      box-shadow:
-        0 0 18px rgba(155,92,255,.35);
-
-      transition: width .5s ease;
+      background: linear-gradient(90deg, var(--purple), var(--pink), var(--blue));
+      box-shadow: 0 0 18px rgba(155,92,255,.38);
+      transition: width 1s cubic-bezier(.2,.8,.2,1);
     }
 
-    .goal-info {
+    .goal-meta {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .goal-name {
-      font-size: 15px;
-      font-weight: 750;
-    }
-
-    .goal-percent {
-      color: var(--purple);
-      font-weight: 800;
-    }
-
-    /* ---------------- FORMS ---------------- */
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-label {
-      display: block;
+      margin-top: 10px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 650;
-      margin: 0 0 7px 3px;
     }
 
-    input,
-    textarea,
-    select {
-      width: 100%;
-
-      border: 1px solid var(--border);
-      outline: none;
-
-      border-radius: 15px;
-
-      padding: 13px 14px;
-
-      background: rgba(255,255,255,.045);
-      color: var(--text);
-
-      transition:
-        border .2s,
-        background .2s,
-        box-shadow .2s;
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+      padding: 30px 18px;
     }
 
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: rgba(155,92,255,.65);
-
-      background: rgba(255,255,255,.065);
-
-      box-shadow:
-        0 0 0 4px rgba(155,92,255,.08);
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #60606b;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    /* ---------------- LISTS ---------------- */
+    /* ---------- Lists ---------- */
 
     .list {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
 
     .list-item {
+      padding: 17px;
       display: flex;
       align-items: center;
-      gap: 12px;
-
-      padding: 14px;
-
-      border-radius: 18px;
-
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-    }
-
-    .list-item-content {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .list-item-title {
-      font-weight: 720;
-      font-size: 14px;
-      margin-bottom: 3px;
-      overflow-wrap: anywhere;
-    }
-
-    .list-item-meta {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .list-item-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .icon-btn {
-      width: 35px;
-      height: 35px;
-
-      display: grid;
-      place-items: center;
-
-      border-radius: 11px;
-
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-
-      color: var(--muted);
-    }
-
-    .icon-btn:active {
-      transform: scale(.94);
-    }
-
-    .empty {
-      padding: 35px 20px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .empty-icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    /* ---------------- HISTORY ---------------- */
-
-    .day-row {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-
-      padding: 13px 0;
-
-      border-bottom: 1px solid rgba(255,255,255,.055);
-    }
-
-    .day-row:last-child {
-      border-bottom: 0;
-    }
-
-    .day-date {
-      width: 42px;
-      height: 42px;
-
-      display: grid;
-      place-items: center;
-
-      flex-shrink: 0;
-
-      border-radius: 13px;
-
-      background: rgba(155,92,255,.10);
-      color: #c9a9ff;
-
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .day-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .day-main {
-      display: flex;
       justify-content: space-between;
-      gap: 10px;
+      gap: 15px;
     }
 
-    .day-label {
-      font-size: 13px;
-      font-weight: 700;
+    .list-main {
+      min-width: 0;
     }
 
-    .day-money {
-      font-size: 13px;
+    .list-title {
+      font-size: 14px;
       font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .day-note {
+    .list-sub {
       color: var(--muted);
       font-size: 11px;
-      margin-top: 4px;
-
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      margin-top: 5px;
     }
 
-    /* ---------------- QUOTE ---------------- */
+    .list-value {
+      flex-shrink: 0;
+      font-weight: 850;
+      font-size: 15px;
+    }
+
+    .green {
+      color: var(--green);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* ---------- Quote ---------- */
 
     .quote-card {
-      padding: 23px;
+      padding: 22px;
+      margin-top: 14px;
     }
 
     .quote-mark {
-      font-size: 42px;
+      font-size: 35px;
       line-height: .7;
       color: var(--purple);
       opacity: .8;
     }
 
     .quote-text {
-      font-size: 19px;
-      line-height: 1.45;
+      margin-top: 10px;
+      font-size: 15px;
+      line-height: 1.55;
       font-weight: 650;
-      letter-spacing: -.3px;
-      margin: 15px 0;
+      letter-spacing: -.01em;
     }
 
     .quote-author {
+      margin-top: 10px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
     }
 
-    /* ---------------- NAVIGATION ---------------- */
+    /* ---------- History ---------- */
+
+    .big-number {
+      padding: 24px;
+    }
+
+    .big-number-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .big-number-value {
+      margin-top: 7px;
+      font-size: 42px;
+      font-weight: 850;
+      letter-spacing: -.06em;
+    }
+
+    /* ---------- Goals / notes ---------- */
+
+    .top-action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .small-btn {
+      min-height: 40px;
+      padding: 0 13px;
+      border-radius: 13px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.08);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .small-btn:active {
+      transform: scale(.95);
+    }
+
+    .goal-actions {
+      display: flex;
+      gap: 7px;
+      margin-top: 15px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(255,255,255,.055);
+      color: var(--muted);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .icon-btn:hover {
+      color: white;
+      background: rgba(255,255,255,.09);
+    }
+
+    .note-card {
+      padding: 18px;
+    }
+
+    .note-title {
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .note-content {
+      margin-top: 8px;
+      color: #c1c1cc;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    /* ---------- Bottom nav ---------- */
 
     .bottom-nav {
       position: fixed;
-      z-index: 100;
-
       left: 50%;
       bottom: max(10px, env(safe-area-inset-bottom));
-
       transform: translateX(-50%);
-
-      width: min(calc(100% - 24px), 600px);
+      width: min(calc(100% - 22px), 720px);
       height: var(--nav-height);
-
+      padding: 8px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      align-items: center;
+      gap: 5px;
+      z-index: 20;
 
-      padding: 7px;
-
-      border-radius: 25px;
-
-      background:
-        rgba(17,17,24,.82);
-
-      border: 1px solid rgba(255,255,255,.10);
-
+      background: rgba(15,15,22,.78);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 24px;
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.42),
+        inset 0 1px 0 rgba(255,255,255,.05);
       backdrop-filter: blur(25px);
       -webkit-backdrop-filter: blur(25px);
-
-      box-shadow:
-        0 15px 60px rgba(0,0,0,.45);
     }
 
     .nav-btn {
-      height: 62px;
-
+      position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-
+      align-items: center;
       gap: 4px;
-
-      border-radius: 19px;
-
+      border-radius: 17px;
       background: transparent;
-      color: #6f6f7b;
+      color: var(--muted2);
+      cursor: pointer;
+      transition:
+        color .2s ease,
+        background .2s ease,
+        transform .2s ease;
+    }
 
-      font-size: 10px;
-      font-weight: 650;
+    .nav-btn.active {
+      color: white;
+      background: rgba(255,255,255,.075);
+    }
 
-      transition: .2s;
+    .nav-btn:active {
+      transform: scale(.92);
     }
 
     .nav-icon {
@@ -766,182 +816,183 @@
       line-height: 1;
     }
 
-    .nav-btn.active {
-      color: white;
-
-      background:
-        linear-gradient(
-          135deg,
-          rgba(155,92,255,.25),
-          rgba(255,79,216,.12)
-        );
+    .nav-label {
+      font-size: 9px;
+      font-weight: 800;
     }
 
-    /* ---------------- MODAL ---------------- */
+    /* ---------- Modal ---------- */
 
     .modal-backdrop {
       position: fixed;
-      z-index: 200;
-
       inset: 0;
-
+      z-index: 50;
       display: none;
       align-items: flex-end;
       justify-content: center;
-
-      padding: 12px;
-
-      background: rgba(0,0,0,.60);
-      backdrop-filter: blur(7px);
-      -webkit-backdrop-filter: blur(7px);
+      padding: 10px;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .modal-backdrop.open {
       display: flex;
+      animation: backdropIn .2s ease both;
+    }
+
+    @keyframes backdropIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .modal {
-      width: min(100%, 620px);
-
-      max-height: calc(100dvh - 24px);
-
+      width: min(100%, 600px);
+      max-height: min(90vh, 720px);
       overflow-y: auto;
-
-      padding: 21px;
-
+      padding: 22px;
       border-radius: 27px;
-
-      background:
-        linear-gradient(
-          145deg,
-          #181820,
-          #101017
-        );
-
-      border: 1px solid rgba(255,255,255,.10);
-
-      box-shadow:
-        0 30px 100px rgba(0,0,0,.6);
-
-      animation: modalIn .25s ease;
+      background: #121219;
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 30px 90px rgba(0,0,0,.5);
+      animation: modalIn .28s cubic-bezier(.2,.8,.2,1) both;
     }
 
     @keyframes modalIn {
       from {
-        transform: translateY(30px);
         opacity: 0;
+        transform: translateY(25px) scale(.97);
       }
-
       to {
-        transform: translateY(0);
         opacity: 1;
+        transform: translateY(0) scale(1);
       }
     }
 
-    .modal-header {
+    .modal-head {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-
+      align-items: center;
       margin-bottom: 20px;
     }
 
     .modal-title {
       font-size: 21px;
-      font-weight: 800;
+      font-weight: 850;
+      letter-spacing: -.04em;
     }
 
     .close-btn {
-      width: 36px;
-      height: 36px;
-
-      border-radius: 50%;
-
-      background: rgba(255,255,255,.07);
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: rgba(255,255,255,.06);
       color: var(--muted);
-
-      font-size: 18px;
+      cursor: pointer;
     }
 
-    /* ---------------- INSTALL ---------------- */
-
-    .install-banner {
-      display: none;
-
-      align-items: center;
-      gap: 12px;
-
-      padding: 14px;
-
-      margin-bottom: 14px;
-
-      border-radius: 19px;
-
-      background:
-        linear-gradient(
-          135deg,
-          rgba(155,92,255,.12),
-          rgba(255,79,216,.07)
-        );
-
-      border: 1px solid rgba(155,92,255,.20);
+    .field {
+      margin-bottom: 15px;
     }
 
-    .install-banner.show {
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      outline: none;
+      background: rgba(255,255,255,.045);
+      color: white;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(155,92,255,.55);
+      background: rgba(255,255,255,.06);
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .modal-actions {
       display: flex;
+      gap: 9px;
+      margin-top: 20px;
     }
 
-    .install-content {
+    .modal-actions button {
       flex: 1;
     }
 
-    .install-title {
-      font-size: 13px;
-      font-weight: 750;
+    .danger-btn {
+      background: rgba(255,93,115,.09);
+      color: #ff8293;
+      border: 1px solid rgba(255,93,115,.13);
     }
 
-    .install-text {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 2px;
-      line-height: 1.4;
+    /* ---------- Install ---------- */
+
+    .install-banner {
+      display: none;
+      margin-bottom: 14px;
+      padding: 14px;
+      border-radius: 17px;
+      background: linear-gradient(
+        135deg,
+        rgba(155,92,255,.11),
+        rgba(76,156,255,.07)
+      );
+      border: 1px solid rgba(155,92,255,.16);
+      color: #cfc4ff;
+      font-size: 12px;
+      line-height: 1.45;
     }
 
-    .install-close {
-      color: var(--muted);
-      background: transparent;
-      padding: 5px;
+    .install-banner.show {
+      display: block;
+      animation: cardIn .5s ease both;
     }
 
-    /* ---------------- TOAST ---------------- */
+    .install-banner strong {
+      color: white;
+    }
+
+    /* ---------- Toast ---------- */
 
     .toast {
       position: fixed;
-      z-index: 500;
-
       left: 50%;
-      bottom: calc(var(--nav-height) + 25px);
-
-      transform:
-        translate(-50%, 15px);
-
-      opacity: 0;
-      pointer-events: none;
-
+      bottom: calc(var(--nav-height) + 24px);
+      z-index: 100;
+      transform: translate(-50%, 15px);
       padding: 11px 15px;
-
       border-radius: 13px;
-
-      background: #f5f5f7;
-      color: #09090d;
-
+      background: rgba(25,25,34,.9);
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow:
+        0 10px 35px rgba(0,0,0,.35),
+        0 0 30px rgba(155,92,255,.12);
+      backdrop-filter: blur(16px);
+      color: white;
       font-size: 12px;
       font-weight: 750;
-
-      transition: .25s;
-
-      box-shadow:
-        0 10px 40px rgba(0,0,0,.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
     }
 
     .toast.show {
@@ -949,23 +1000,26 @@
       transform: translate(-50%, 0);
     }
 
-    /* ---------------- DESKTOP ---------------- */
+    /* ---------- Reduced motion ---------- */
 
-    @media (min-width: 700px) {
-      .app {
-        padding-top: 35px;
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    @media (min-width: 600px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
       }
 
-      .bottom-nav {
-        bottom: 18px;
-      }
-
-      .modal-backdrop {
-        align-items: center;
-      }
-
-      .modal {
-        max-height: 90vh;
+      .stat {
+        min-height: 115px;
       }
     }
   </style>
@@ -973,366 +1027,232 @@
 
 <body>
 
-  <main class="app">
+  <div class="ambient one"></div>
+  <div class="ambient two"></div>
+  <div class="ambient three"></div>
 
-    <!-- HEADER -->
+  <main class="app">
 
     <header class="topbar">
       <div class="brand">
-        <div class="brand-icon">✦</div>
-
-        <div>
-          <div class="brand-name">Progress</div>
-          <div class="brand-subtitle">Your daily evolution</div>
-        </div>
+        <span class="brand-dot"></span>
+        Progress
       </div>
-
-      <div class="date-label" id="headerDate"></div>
+      <div class="top-date" id="topDate"></div>
     </header>
 
-    <!-- INSTALL -->
-
     <div class="install-banner" id="installBanner">
-      <div style="font-size:24px;">📲</div>
-
-      <div class="install-content">
-        <div class="install-title">
-          Dodaj Progress do ekranu głównego
-        </div>
-
-        <div class="install-text">
-          Safari → Udostępnij → Dodaj do ekranu początkowego
-        </div>
-      </div>
-
-      <button
-        class="install-close"
-        onclick="closeInstallBanner()"
-      >
-        ✕
-      </button>
+      <strong>Dodaj Progress do ekranu głównego.</strong><br>
+      W Safari wybierz <b>Udostępnij → Dodaj do ekranu początkowego</b>.
     </div>
 
     <!-- ================= HOME ================= -->
 
-    <section
-      class="page active"
-      id="page-home"
-    >
+    <section class="page active" id="page-home">
 
-      <h1 class="page-title">
-        Dzisiaj.
-      </h1>
+      <div class="eyebrow">Twój dzisiejszy progres</div>
+      <h1 class="page-title">Dzisiaj.</h1>
 
-      <p class="page-description">
-        Mały krok każdego dnia.
-      </p>
-
-      <div class="card hero-card">
-
-        <div class="eyebrow">
-          Dzisiejszy zarobek
-        </div>
-
-        <div
-          class="big-money money-positive"
-          id="todayMoney"
-        >
-          0 zł
-        </div>
-
-        <div class="hero-bottom">
-
-          <div class="streak">
-            🔥 <span id="streakValue">0 dni</span>
+      <div class="card hero pressable">
+        <div class="hero-top">
+          <div>
+            <div class="eyebrow">Zarobione</div>
+            <div class="hero-money" id="todayMoney">0 zł</div>
+            <div class="hero-label">dzisiejszy wynik</div>
           </div>
 
-          <button
-            class="primary-btn"
-            onclick="openDayModal()"
-          >
-            + Dodaj dzień
-          </button>
-
+          <div class="streak">
+            <span class="streak-icon">🔥</span>
+            <span id="streakValue">0 dni</span>
+          </div>
         </div>
 
+        <div class="hero-action">
+          <button class="primary-btn" onclick="openDayModal()">
+            <span class="plus">+</span>
+            Dodaj dzień
+          </button>
+        </div>
       </div>
+
+      <!-- CHART -->
+
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-label">Zarobki</div>
+            <div class="chart-total" id="chartTotal">0 zł</div>
+            <div class="chart-change neutral" id="chartChange">
+              Ostatnie 7 dni
+            </div>
+          </div>
+
+          <div class="chart-toggle">
+            <button
+              id="chart7"
+              class="active"
+              onclick="setChartRange(7)"
+            >
+              7 dni
+            </button>
+            <button
+              id="chart30"
+              onclick="setChartRange(30)"
+            >
+              30 dni
+            </button>
+          </div>
+        </div>
+
+        <div class="chart-wrap" id="chartWrap">
+          <canvas id="earningsChart"></canvas>
+
+          <div class="chart-tooltip" id="chartTooltip">
+            <div class="tooltip-date" id="tooltipDate"></div>
+            <div class="tooltip-money" id="tooltipMoney"></div>
+          </div>
+
+          <div class="chart-labels" id="chartLabels"></div>
+        </div>
+      </div>
+
+      <!-- STATS -->
 
       <div class="stats-grid">
 
-        <div class="stat-card">
-          <div class="stat-icon">◈</div>
-          <div
-            class="stat-value"
-            id="monthMoney"
-          >
-            0 zł
-          </div>
-          <div class="stat-label">
-            Ten miesiąc
-          </div>
+        <div class="card stat">
+          <div class="stat-label">Ten miesiąc</div>
+          <div class="stat-value" id="monthTotal">0 zł</div>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">↗</div>
-          <div
-            class="stat-value"
-            id="averageMoney"
-          >
-            0 zł
-          </div>
-          <div class="stat-label">
-            Średnio / dzień
-          </div>
+        <div class="card stat">
+          <div class="stat-label">Średnia / dzień</div>
+          <div class="stat-value" id="averageTotal">0 zł</div>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">★</div>
-          <div
-            class="stat-value"
-            id="bestDay"
-          >
-            0 zł
-          </div>
-          <div class="stat-label">
-            Najlepszy dzień
-          </div>
+        <div class="card stat">
+          <div class="stat-label">Najlepszy dzień</div>
+          <div class="stat-value" id="bestDay">0 zł</div>
         </div>
 
-        <div class="stat-card">
-          <div class="stat-icon">✓</div>
-          <div
-            class="stat-value"
-            id="daysCount"
-          >
-            0
-          </div>
-          <div class="stat-label">
-            Zapisanych dni
-          </div>
+        <div class="card stat">
+          <div class="stat-label">Łącznie</div>
+          <div class="stat-value" id="allTimeTotal">0 zł</div>
         </div>
 
       </div>
 
-      <div class="section-heading">
-        <h2>Aktualny cel</h2>
-        <span id="goalSmallLabel">—</span>
-      </div>
+      <!-- GOAL -->
 
-      <div
-        class="card"
-        id="homeGoalCard"
-      ></div>
+      <div class="section-title">Aktualny cel</div>
+      <div id="homeGoal"></div>
 
-      <div class="section-heading">
-        <h2>Ostatnie dni</h2>
+      <!-- RECENT -->
 
-        <button
-          class="secondary-btn"
-          style="min-height:34px;padding:0 11px"
-          onclick="navigate('history')"
-        >
-          Wszystkie
-        </button>
-      </div>
+      <div class="section-title">Ostatnie dni</div>
+      <div id="recentDays" class="list"></div>
 
-      <div
-        class="card"
-        id="recentDays"
-      ></div>
+      <!-- QUOTE -->
 
-      <div class="section-heading">
-        <h2>Myśl na dziś</h2>
-      </div>
-
-      <div
-        class="card quote-card"
-        id="homeQuote"
-      ></div>
+      <div id="homeQuote"></div>
 
     </section>
 
 
     <!-- ================= HISTORY ================= -->
 
-    <section
-      class="page"
-      id="page-history"
-    >
+    <section class="page" id="page-history">
 
-      <h1 class="page-title">
-        Historia
-      </h1>
+      <div class="eyebrow">Twoje wyniki</div>
+      <h1 class="page-title">Historia.</h1>
 
-      <p class="page-description">
-        Zobacz, jak wyglądała Twoja droga.
-      </p>
-
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-
-          <div
-            class="stat-value"
-            id="historyTotal"
-          >
-            0 zł
-          </div>
-
-          <div class="stat-label">
-            Łącznie
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
-
-          <div
-            class="stat-value"
-            id="historyDays"
-          >
-            0
-          </div>
-
-          <div class="stat-label">
-            Dni
-          </div>
-        </div>
-
+      <div class="card big-number">
+        <div class="big-number-label">Łącznie zarobione</div>
+        <div class="big-number-value" id="historyTotal">0 zł</div>
       </div>
 
-      <div class="card">
-
-        <div
-          id="historyList"
-          class="list"
-        ></div>
-
-      </div>
+      <div class="section-title">Wszystkie dni</div>
+      <div id="historyList" class="list"></div>
 
     </section>
 
 
     <!-- ================= GOALS ================= -->
 
-    <section
-      class="page"
-      id="page-goals"
-    >
+    <section class="page" id="page-goals">
 
-      <h1 class="page-title">
-        Cele
-      </h1>
+      <div class="top-action-row">
+        <div>
+          <div class="eyebrow">Kierunek</div>
+          <h1 class="page-title" style="margin-bottom:0">Cele.</h1>
+        </div>
 
-      <p class="page-description">
-        Miej przed oczami to, do czego zmierzasz.
-      </p>
+        <button class="small-btn" onclick="openGoalModal()">
+          + Cel
+        </button>
+      </div>
 
-      <button
-        class="primary-btn"
-        style="width:100%; margin-bottom:15px"
-        onclick="openGoalModal()"
-      >
-        + Dodaj cel
-      </button>
-
-      <div
-        id="goalsList"
-        class="list"
-      ></div>
+      <div id="goalsList" class="list"></div>
 
     </section>
 
 
     <!-- ================= NOTES ================= -->
 
-    <section
-      class="page"
-      id="page-notes"
-    >
+    <section class="page" id="page-notes">
 
-      <h1 class="page-title">
-        Notatki
-      </h1>
+      <div class="top-action-row">
+        <div>
+          <div class="eyebrow">Myśli & inspiracje</div>
+          <h1 class="page-title" style="margin-bottom:0">Notatki.</h1>
+        </div>
 
-      <p class="page-description">
-        Pomysły, refleksje, plany. Wszystko w jednym miejscu.
-      </p>
-
-      <button
-        class="primary-btn"
-        style="width:100%; margin-bottom:15px"
-        onclick="openNoteModal()"
-      >
-        + Nowa notatka
-      </button>
-
-      <div
-        id="notesList"
-        class="list"
-      ></div>
-
-      <div class="section-heading">
-        <h2>Twoje cytaty</h2>
+        <button class="small-btn" onclick="openNoteModal()">
+          + Notatka
+        </button>
       </div>
 
+      <div id="notesList" class="list"></div>
+
+      <div class="section-title">Cytaty</div>
+
       <button
-        class="secondary-btn"
-        style="width:100%; margin-bottom:15px"
+        class="small-btn"
+        style="margin-bottom:12px"
         onclick="openQuoteModal()"
       >
-        + Dodaj cytat
+        + Cytat
       </button>
 
-      <div
-        id="quotesList"
-        class="list"
-      ></div>
+      <div id="quotesList" class="list"></div>
 
     </section>
 
   </main>
 
 
-  <!-- ================= NAVIGATION ================= -->
+  <!-- ================= NAV ================= -->
 
   <nav class="bottom-nav">
 
-    <button
-      class="nav-btn active"
-      data-page="home"
-      onclick="navigate('home')"
-    >
+    <button class="nav-btn active" data-page="home" onclick="navigate('home')">
       <span class="nav-icon">⌂</span>
-      <span>Start</span>
+      <span class="nav-label">Start</span>
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="history"
-      onclick="navigate('history')"
-    >
-      <span class="nav-icon">◷</span>
-      <span>Historia</span>
+    <button class="nav-btn" data-page="history" onclick="navigate('history')">
+      <span class="nav-icon">◴</span>
+      <span class="nav-label">Historia</span>
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="goals"
-      onclick="navigate('goals')"
-    >
+    <button class="nav-btn" data-page="goals" onclick="navigate('goals')">
       <span class="nav-icon">◎</span>
-      <span>Cele</span>
+      <span class="nav-label">Cele</span>
     </button>
 
-    <button
-      class="nav-btn"
-      data-page="notes"
-      onclick="navigate('notes')"
-    >
-      <span class="nav-icon">✎</span>
-      <span>Notatki</span>
+    <button class="nav-btn" data-page="notes" onclick="navigate('notes')">
+      <span class="nav-icon">⌁</span>
+      <span class="nav-label">Notatki</span>
     </button>
 
   </nav>
@@ -1340,1537 +1260,1979 @@
 
   <!-- ================= MODAL ================= -->
 
-  <div
-    class="modal-backdrop"
-    id="modalBackdrop"
-    onclick="backdropClick(event)"
-  >
+  <div class="modal-backdrop" id="modalBackdrop" onclick="backdropClose(event)">
+    <div class="modal" id="modal">
 
-    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle"></div>
 
-      <div class="modal-header">
-
-        <div
-          class="modal-title"
-          id="modalTitle"
-        >
-          Dodaj
-        </div>
-
-        <button
-          class="close-btn"
-          onclick="closeModal()"
-        >
-          ✕
+        <button class="close-btn" onclick="closeModal()">
+          ×
         </button>
-
       </div>
 
       <div id="modalContent"></div>
 
     </div>
-
   </div>
 
 
-  <!-- ================= TOAST ================= -->
+  <div class="toast" id="toast"></div>
 
-  <div
-    class="toast"
-    id="toast"
-  ></div>
 
+  <script>
+    /* ============================================================
+       DATA
+    ============================================================ */
 
-<script>
-/* ============================================================
-   PROGRESS APP
-   ============================================================ */
+    const STORAGE_KEY = "progress_app_v1";
 
-const STORAGE_KEY = "progress_app_v1";
+    let state = {
+      days: [],
+      goals: [],
+      notes: [],
+      quotes: []
+    };
 
-let state = {
-  days: [],
-  goals: [],
-  notes: [],
-  quotes: []
-};
+    let currentModal = null;
+    let chartRange = 7;
+    let chartPoints = [];
 
-let currentPage = "home";
-let editingId = null;
+    const moneyFormatter = new Intl.NumberFormat("pl-PL", {
+      maximumFractionDigits: 2
+    });
 
+    const shortMoneyFormatter = new Intl.NumberFormat("pl-PL", {
+      maximumFractionDigits: 0
+    });
 
-/* ============================================================
-   STORAGE
-   ============================================================ */
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    /* ============================================================
+       STORAGE
+    ============================================================ */
 
-    if (saved) {
-      state = {
-        ...state,
-        ...JSON.parse(saved)
-      };
-    }
-  } catch (error) {
-    console.error("Nie udało się wczytać danych", error);
-  }
-}
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
 
-function saveState() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(state)
-  );
-}
+        if (raw) {
+          const parsed = JSON.parse(raw);
 
-
-/* ============================================================
-   HELPERS
-   ============================================================ */
-
-function uid() {
-  return Date.now().toString(36) +
-    Math.random().toString(36).substring(2);
-}
-
-function todayISO() {
-  const now = new Date();
-
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
-}
-
-function formatMoney(value) {
-  return new Intl.NumberFormat("pl-PL", {
-    maximumFractionDigits: 2
-  }).format(Number(value) || 0) + " zł";
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString + "T12:00:00");
-
-  return new Intl.DateTimeFormat("pl-PL", {
-    day: "numeric",
-    month: "short"
-  }).format(date);
-}
-
-function formatFullDate(dateString) {
-  const date = new Date(dateString + "T12:00:00");
-
-  return new Intl.DateTimeFormat("pl-PL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  }).format(date);
-}
-
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function showToast(message) {
-  const toast = document.getElementById("toast");
-
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  clearTimeout(window.toastTimer);
-
-  window.toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2200);
-}
-
-
-/* ============================================================
-   DATE
-   ============================================================ */
-
-function renderHeaderDate() {
-  const today = new Date();
-
-  document.getElementById("headerDate").innerHTML = `
-    ${new Intl.DateTimeFormat("pl-PL", {
-      weekday: "short"
-    }).format(today)}
-    <br>
-    ${new Intl.DateTimeFormat("pl-PL", {
-      day: "numeric",
-      month: "short"
-    }).format(today)}
-  `;
-}
-
-
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
-
-function navigate(page) {
-  currentPage = page;
-
-  document.querySelectorAll(".page").forEach(element => {
-    element.classList.remove("active");
-  });
-
-  document
-    .getElementById(`page-${page}`)
-    .classList.add("active");
-
-  document.querySelectorAll(".nav-btn").forEach(button => {
-    button.classList.toggle(
-      "active",
-      button.dataset.page === page
-    );
-  });
-
-  renderAll();
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-}
-
-
-/* ============================================================
-   DAYS
-   ============================================================ */
-
-function getTodayEntry() {
-  return state.days.find(
-    day => day.date === todayISO()
-  );
-}
-
-function calculateTotal() {
-  return state.days.reduce(
-    (sum, day) => sum + Number(day.money || 0),
-    0
-  );
-}
-
-function calculateMonthTotal() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = now.getMonth();
-
-  return state.days
-    .filter(day => {
-      const date = new Date(day.date + "T12:00:00");
-
-      return (
-        date.getFullYear() === year &&
-        date.getMonth() === month
-      );
-    })
-    .reduce(
-      (sum, day) => sum + Number(day.money || 0),
-      0
-    );
-}
-
-function calculateAverage() {
-  if (!state.days.length) {
-    return 0;
-  }
-
-  return calculateTotal() / state.days.length;
-}
-
-function calculateBestDay() {
-  if (!state.days.length) {
-    return 0;
-  }
-
-  return Math.max(
-    ...state.days.map(day => Number(day.money || 0))
-  );
-}
-
-function calculateStreak() {
-  if (!state.days.length) {
-    return 0;
-  }
-
-  const dates = new Set(
-    state.days.map(day => day.date)
-  );
-
-  let streak = 0;
-
-  const current = new Date();
-
-  while (true) {
-    const y = current.getFullYear();
-    const m = String(current.getMonth() + 1).padStart(2, "0");
-    const d = String(current.getDate()).padStart(2, "0");
-
-    const key = `${y}-${m}-${d}`;
-
-    if (!dates.has(key)) {
-      break;
-    }
-
-    streak++;
-
-    current.setDate(
-      current.getDate() - 1
-    );
-  }
-
-  return streak;
-}
-
-
-/* ============================================================
-   HOME
-   ============================================================ */
-
-function renderHome() {
-  const today = getTodayEntry();
-
-  document.getElementById("todayMoney").textContent =
-    formatMoney(today ? today.money : 0);
-
-  document.getElementById("streakValue").textContent =
-    `${calculateStreak()} ${calculateStreak() === 1 ? "dzień" : "dni"}`;
-
-  document.getElementById("monthMoney").textContent =
-    formatMoney(calculateMonthTotal());
-
-  document.getElementById("averageMoney").textContent =
-    formatMoney(calculateAverage());
-
-  document.getElementById("bestDay").textContent =
-    formatMoney(calculateBestDay());
-
-  document.getElementById("daysCount").textContent =
-    state.days.length;
-
-  renderHomeGoal();
-  renderRecentDays();
-  renderHomeQuote();
-}
-
-function renderHomeGoal() {
-  const card = document.getElementById("homeGoalCard");
-
-  if (!state.goals.length) {
-    document.getElementById("goalSmallLabel").textContent = "Brak";
-
-    card.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">◎</div>
-        <div>Nie masz jeszcze celu.</div>
-
-        <button
-          class="secondary-btn"
-          style="margin-top:14px"
-          onclick="openGoalModal()"
-        >
-          Ustaw pierwszy cel
-        </button>
-      </div>
-    `;
-
-    return;
-  }
-
-  const goal = state.goals[0];
-
-  const current = Number(goal.current || 0);
-  const target = Number(goal.target || 0);
-
-  const percent = target > 0
-    ? Math.min(100, (current / target) * 100)
-    : 0;
-
-  document.getElementById("goalSmallLabel").textContent =
-    `${Math.round(percent)}%`;
-
-  card.innerHTML = `
-    <div class="goal-info">
-      <div>
-        <div class="goal-name">
-          ${escapeHTML(goal.name)}
-        </div>
-
-        <div
-          style="color:var(--muted);font-size:11px;margin-top:4px"
-        >
-          ${formatMoney(current)}
-          z
-          ${formatMoney(target)}
-        </div>
-      </div>
-
-      <div class="goal-percent">
-        ${Math.round(percent)}%
-      </div>
-    </div>
-
-    <div class="progress-track">
-      <div
-        class="progress-fill"
-        style="width:${percent}%"
-      ></div>
-    </div>
-
-    ${
-      goal.deadline
-        ? `
-          <div
-            style="
-              color:var(--muted);
-              font-size:11px;
-              margin-top:10px;
-            "
-          >
-            Termin: ${formatFullDate(goal.deadline)}
-          </div>
-        `
-        : ""
-    }
-  `;
-}
-
-function renderRecentDays() {
-  const container =
-    document.getElementById("recentDays");
-
-  const days = [...state.days]
-    .sort((a,b) => b.date.localeCompare(a.date))
-    .slice(0, 5);
-
-  if (!days.length) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">◷</div>
-        <div>Dodaj swój pierwszy dzień.</div>
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML = days.map(day => `
-    <div class="day-row">
-
-      <div class="day-date">
-        ${escapeHTML(formatDate(day.date))}
-      </div>
-
-      <div class="day-content">
-
-        <div class="day-main">
-
-          <div class="day-label">
-            ${escapeHTML(
-              day.date === todayISO()
-                ? "Dzisiaj"
-                : formatFullDate(day.date)
-            )}
-          </div>
-
-          <div class="day-money">
-            ${formatMoney(day.money)}
-          </div>
-
-        </div>
-
-        ${
-          day.note
-            ? `
-              <div class="day-note">
-                ${escapeHTML(day.note)}
-              </div>
-            `
-            : ""
+          state = {
+            days: Array.isArray(parsed.days) ? parsed.days : [],
+            goals: Array.isArray(parsed.goals) ? parsed.goals : [],
+            notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+            quotes: Array.isArray(parsed.quotes) ? parsed.quotes : []
+          };
         }
-
-      </div>
-
-    </div>
-  `).join("");
-}
-
-function renderHomeQuote() {
-  const container =
-    document.getElementById("homeQuote");
-
-  if (!state.quotes.length) {
-    container.innerHTML = `
-      <div class="quote-mark">“</div>
-
-      <div class="quote-text">
-        Nie musisz być lepszy od innych.
-        Wystarczy, że jesteś lepszy niż wczoraj.
-      </div>
-
-      <div class="quote-author">
-        — Twój Progress
-      </div>
-    `;
-
-    return;
-  }
-
-  const index =
-    new Date().getDate() %
-    state.quotes.length;
-
-  const quote = state.quotes[index];
-
-  container.innerHTML = `
-    <div class="quote-mark">“</div>
-
-    <div class="quote-text">
-      ${escapeHTML(quote.text)}
-    </div>
-
-    <div class="quote-author">
-      ${
-        quote.author
-          ? "— " + escapeHTML(quote.author)
-          : "— Twój cytat"
+      } catch (error) {
+        console.error("Nie udało się wczytać danych.", error);
       }
-    </div>
-  `;
-}
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
 
 
-/* ============================================================
-   DAY MODAL
-   ============================================================ */
+    /* ============================================================
+       DATE
+    ============================================================ */
 
-function openDayModal(date = todayISO()) {
-  const existing =
-    state.days.find(day => day.date === date);
+    function todayISO() {
+      const d = new Date();
 
-  editingId = existing ? existing.id : null;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
 
-  openModal(
-    existing
-      ? "Edytuj dzień"
-      : "Dodaj dzień",
-    `
-      <form onsubmit="saveDay(event)">
+      return `${y}-${m}-${day}`;
+    }
 
-        <div class="form-group">
-          <label class="form-label">
-            Data
-          </label>
+    function dateFromISO(iso) {
+      const [y, m, d] = iso.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
 
-          <input
-            id="dayDate"
-            type="date"
-            value="${date}"
-            required
-          >
-        </div>
+    function dateToISO(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
 
-        <div class="form-group">
-          <label class="form-label">
-            Ile zarobiłeś?
-          </label>
+      return `${y}-${m}-${d}`;
+    }
 
-          <input
-            id="dayMoney"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="np. 250"
-            value="${existing ? existing.money : ""}"
-            required
-          >
-        </div>
+    function getLastNDates(n, offset = 0) {
+      const result = [];
+      const today = new Date();
 
-        <div class="form-group">
-          <label class="form-label">
-            Notatka
-          </label>
+      today.setHours(0, 0, 0, 0);
 
-          <textarea
-            id="dayNote"
-            placeholder="Co dzisiaj zrobiłeś? Jak Ci poszło?"
-          >${existing ? escapeHTML(existing.note || "") : ""}</textarea>
-        </div>
+      for (let i = n - 1 + offset; i >= offset; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        result.push(dateToISO(d));
+      }
 
-        <button
-          class="primary-btn"
-          style="width:100%"
-          type="submit"
-        >
-          Zapisz dzień
-        </button>
+      return result;
+    }
 
-        ${
-          existing
-            ? `
-              <button
-                class="secondary-btn danger-btn"
-                style="width:100%;margin-top:9px"
-                type="button"
-                onclick="deleteDay('${existing.id}')"
-              >
-                Usuń dzień
-              </button>
-            `
-            : ""
-        }
+    function formatMoney(value) {
+      const number = Number(value) || 0;
+      return `${moneyFormatter.format(number)} zł`;
+    }
 
-      </form>
-    `
-  );
-}
+    function formatDate(iso) {
+      const d = dateFromISO(iso);
 
-function saveDay(event) {
-  event.preventDefault();
+      return d.toLocaleDateString("pl-PL", {
+        weekday: "short",
+        day: "numeric",
+        month: "short"
+      });
+    }
 
-  const date =
-    document.getElementById("dayDate").value;
+    function formatFullDate(iso) {
+      const d = dateFromISO(iso);
 
-  const money =
-    Number(document.getElementById("dayMoney").value);
+      return d.toLocaleDateString("pl-PL", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+    }
 
-  const note =
-    document.getElementById("dayNote").value.trim();
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-  if (!date || Number.isNaN(money)) {
-    return;
-  }
 
-  const duplicate =
-    state.days.find(
-      day =>
-        day.date === date &&
-        day.id !== editingId
-    );
+    /* ============================================================
+       TOAST
+    ============================================================ */
 
-  if (duplicate) {
-    showToast("Ten dzień już istnieje.");
-    return;
-  }
+    let toastTimer;
 
-  if (editingId) {
-    const index =
-      state.days.findIndex(
-        day => day.id === editingId
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1900);
+    }
+
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+
+    function renderHeaderDate() {
+      const d = new Date();
+
+      document.getElementById("topDate").textContent =
+        d.toLocaleDateString("pl-PL", {
+          day: "numeric",
+          month: "long"
+        });
+    }
+
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+
+    function navigate(page) {
+      document.querySelectorAll(".page").forEach(el => {
+        el.classList.remove("active");
+      });
+
+      document.getElementById(`page-${page}`).classList.add("active");
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle(
+          "active",
+          btn.dataset.page === page
+        );
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      if (page === "home") {
+        requestAnimationFrame(() => {
+          renderChart();
+        });
+      }
+    }
+
+
+    /* ============================================================
+       DAY STATS
+    ============================================================ */
+
+    function getTodayEntry() {
+      const today = todayISO();
+
+      return state.days.find(day => day.date === today);
+    }
+
+    function calculateTotal() {
+      return state.days.reduce(
+        (sum, day) => sum + Number(day.money || 0),
+        0
+      );
+    }
+
+    function calculateMonthTotal() {
+      const now = new Date();
+
+      const month = now.getMonth();
+      const year = now.getFullYear();
+
+      return state.days
+        .filter(day => {
+          const d = dateFromISO(day.date);
+
+          return (
+            d.getMonth() === month &&
+            d.getFullYear() === year
+          );
+        })
+        .reduce(
+          (sum, day) => sum + Number(day.money || 0),
+          0
+        );
+    }
+
+    function calculateAverage() {
+      if (!state.days.length) return 0;
+
+      return calculateTotal() / state.days.length;
+    }
+
+    function calculateBestDay() {
+      if (!state.days.length) return 0;
+
+      return Math.max(
+        ...state.days.map(day => Number(day.money || 0))
+      );
+    }
+
+    function calculateStreak() {
+      if (!state.days.length) return 0;
+
+      const dates = new Set(
+        state.days.map(day => day.date)
       );
 
-    state.days[index] = {
-      ...state.days[index],
-      date,
-      money,
-      note
-    };
+      let streak = 0;
+      const cursor = new Date();
 
-  } else {
+      cursor.setHours(0, 0, 0, 0);
 
-    state.days.push({
-      id: uid(),
-      date,
-      money,
-      note
-    });
+      while (dates.has(dateToISO(cursor))) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
 
-  }
-
-  state.days.sort(
-    (a,b) => b.date.localeCompare(a.date)
-  );
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Dzień zapisany ✓");
-}
-
-function deleteDay(id) {
-  if (!confirm("Usunąć ten dzień?")) {
-    return;
-  }
-
-  state.days =
-    state.days.filter(day => day.id !== id);
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Dzień usunięty");
-}
+      return streak;
+    }
 
 
-/* ============================================================
-   HISTORY
-   ============================================================ */
+    /* ============================================================
+       NUMBER ANIMATION
+    ============================================================ */
 
-function renderHistory() {
-  document.getElementById("historyTotal").textContent =
-    formatMoney(calculateTotal());
+    function animateMoney(element, target) {
+      if (!element) return;
 
-  document.getElementById("historyDays").textContent =
-    state.days.length;
+      const end = Number(target) || 0;
 
-  const container =
-    document.getElementById("historyList");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        element.textContent = formatMoney(end);
+        return;
+      }
 
-  const days = [...state.days]
-    .sort((a,b) => b.date.localeCompare(a.date));
+      const duration = 550;
+      const startTime = performance.now();
 
-  if (!days.length) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">◷</div>
-        Brak historii.
-      </div>
-    `;
+      function easeOut(t) {
+        return 1 - Math.pow(1 - t, 3);
+      }
 
-    return;
-  }
+      function frame(now) {
+        const progress = Math.min(
+          (now - startTime) / duration,
+          1
+        );
 
-  container.innerHTML = days.map(day => `
-    <div class="day-row">
+        const value = end * easeOut(progress);
 
-      <div class="day-date">
-        ${escapeHTML(formatDate(day.date))}
-      </div>
+        element.textContent = formatMoney(value);
 
-      <div class="day-content">
-
-        <div class="day-main">
-
-          <div class="day-label">
-            ${escapeHTML(formatFullDate(day.date))}
-          </div>
-
-          <div class="day-money">
-            ${formatMoney(day.money)}
-          </div>
-
-        </div>
-
-        ${
-          day.note
-            ? `
-              <div class="day-note">
-                ${escapeHTML(day.note)}
-              </div>
-            `
-            : ""
+        if (progress < 1) {
+          requestAnimationFrame(frame);
         }
+      }
 
-      </div>
-
-      <button
-        class="icon-btn"
-        onclick="openDayModal('${day.date}')"
-      >
-        ✎
-      </button>
-
-    </div>
-  `).join("");
-}
+      requestAnimationFrame(frame);
+    }
 
 
-/* ============================================================
-   GOALS
-   ============================================================ */
+    /* ============================================================
+       HOME
+    ============================================================ */
 
-function openGoalModal(id = null) {
-  const existing =
-    state.goals.find(goal => goal.id === id);
+    function renderHome() {
+      const today = getTodayEntry();
 
-  editingId = id;
-
-  openModal(
-    existing ? "Edytuj cel" : "Nowy cel",
-    `
-      <form onsubmit="saveGoal(event)">
-
-        <div class="form-group">
-          <label class="form-label">
-            Nazwa celu
-          </label>
-
-          <input
-            id="goalName"
-            type="text"
-            placeholder="np. 10 000 zł"
-            value="${existing ? escapeHTML(existing.name) : ""}"
-            required
-          >
-        </div>
-
-        <div class="row">
-
-          <div class="form-group">
-            <label class="form-label">
-              Aktualnie
-            </label>
-
-            <input
-              id="goalCurrent"
-              type="number"
-              step="0.01"
-              min="0"
-              value="${existing ? existing.current : 0}"
-              required
-            >
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              Cel
-            </label>
-
-            <input
-              id="goalTarget"
-              type="number"
-              step="0.01"
-              min="1"
-              placeholder="10000"
-              value="${existing ? existing.target : ""}"
-              required
-            >
-          </div>
-
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            Termin — opcjonalnie
-          </label>
-
-          <input
-            id="goalDeadline"
-            type="date"
-            value="${existing ? existing.deadline || "" : ""}"
-          >
-        </div>
-
-        <button
-          class="primary-btn"
-          style="width:100%"
-          type="submit"
-        >
-          Zapisz cel
-        </button>
-
-        ${
-          existing
-            ? `
-              <button
-                class="secondary-btn danger-btn"
-                style="width:100%;margin-top:9px"
-                type="button"
-                onclick="deleteGoal('${existing.id}')"
-              >
-                Usuń cel
-              </button>
-            `
-            : ""
-        }
-
-      </form>
-    `
-  );
-}
-
-function saveGoal(event) {
-  event.preventDefault();
-
-  const name =
-    document.getElementById("goalName").value.trim();
-
-  const current =
-    Number(document.getElementById("goalCurrent").value);
-
-  const target =
-    Number(document.getElementById("goalTarget").value);
-
-  const deadline =
-    document.getElementById("goalDeadline").value;
-
-  if (!name || target <= 0) {
-    return;
-  }
-
-  if (editingId) {
-    const index =
-      state.goals.findIndex(
-        goal => goal.id === editingId
+      animateMoney(
+        document.getElementById("todayMoney"),
+        today ? Number(today.money) : 0
       );
 
-    state.goals[index] = {
-      ...state.goals[index],
-      name,
-      current,
-      target,
-      deadline
-    };
+      document.getElementById("streakValue").textContent =
+        `${calculateStreak()} ${calculateStreak() === 1 ? "dzień" : "dni"}`;
 
-  } else {
+      animateMoney(
+        document.getElementById("monthTotal"),
+        calculateMonthTotal()
+      );
 
-    state.goals.push({
-      id: uid(),
-      name,
-      current,
-      target,
-      deadline
-    });
+      animateMoney(
+        document.getElementById("averageTotal"),
+        calculateAverage()
+      );
 
-  }
+      animateMoney(
+        document.getElementById("bestDay"),
+        calculateBestDay()
+      );
 
-  saveState();
-  closeModal();
-  renderAll();
+      animateMoney(
+        document.getElementById("allTimeTotal"),
+        calculateTotal()
+      );
 
-  showToast("Cel zapisany ✓");
-}
+      renderHomeGoal();
+      renderRecentDays();
+      renderHomeQuote();
 
-function deleteGoal(id) {
-  if (!confirm("Usunąć ten cel?")) {
-    return;
-  }
+      requestAnimationFrame(() => {
+        renderChart();
+      });
+    }
 
-  state.goals =
-    state.goals.filter(goal => goal.id !== id);
 
-  saveState();
-  closeModal();
-  renderAll();
+    /* ============================================================
+       HOME GOAL
+    ============================================================ */
 
-  showToast("Cel usunięty");
-}
+    function renderHomeGoal() {
+      const container = document.getElementById("homeGoal");
 
-function renderGoals() {
-  const container =
-    document.getElementById("goalsList");
+      if (!state.goals.length) {
+        container.innerHTML = `
+          <div class="card goal-card">
+            <div class="empty">
+              Nie masz jeszcze celu.<br>
+              Dodaj pierwszy i zacznij go realizować.
+            </div>
+          </div>
+        `;
 
-  if (!state.goals.length) {
-    container.innerHTML = `
-      <div class="card">
-        <div class="empty">
-          <div class="empty-icon">◎</div>
-          Nie masz jeszcze żadnych celów.
-        </div>
-      </div>
-    `;
+        return;
+      }
 
-    return;
-  }
+      const goal = state.goals[0];
 
-  container.innerHTML = state.goals.map(goal => {
+      const current = Number(goal.current || 0);
+      const target = Number(goal.target || 0);
 
-    const current =
-      Number(goal.current || 0);
-
-    const target =
-      Number(goal.target || 0);
-
-    const percent =
-      target > 0
-        ? Math.min(100, current / target * 100)
+      const percent = target
+        ? Math.min(100, Math.max(0, current / target * 100))
         : 0;
 
-    return `
-      <div class="card">
+      const remaining = Math.max(0, target - current);
 
-        <div class="goal-info">
+      container.innerHTML = `
+        <div class="card goal-card pressable">
 
-          <div>
-            <div class="goal-name">
-              ${escapeHTML(goal.name)}
+          <div class="goal-head">
+            <div>
+              <div class="goal-name">
+                ${escapeHTML(goal.name)}
+              </div>
+
+              <div class="goal-meta" style="justify-content:flex-start;gap:7px">
+                <span>${formatMoney(current)}</span>
+                <span>/</span>
+                <span>${formatMoney(target)}</span>
+              </div>
             </div>
 
+            <div class="goal-percent">
+              ${Math.round(percent)}%
+            </div>
+          </div>
+
+          <div class="progress">
             <div
-              style="
-                color:var(--muted);
-                font-size:11px;
-                margin-top:4px
-              "
-            >
-              ${formatMoney(current)}
-              / ${formatMoney(target)}
-            </div>
+              class="progress-fill"
+              style="width:0"
+              data-progress="${percent}"
+            ></div>
           </div>
 
-          <div class="goal-percent">
-            ${Math.round(percent)}%
+          <div class="goal-meta">
+            <span>
+              ${remaining > 0
+                ? `Pozostało ${formatMoney(remaining)}`
+                : "Cel osiągnięty 🎉"}
+            </span>
+
+            <span>
+              ${goal.deadline
+                ? escapeHTML(formatDate(goal.deadline))
+                : ""}
+            </span>
           </div>
 
         </div>
+      `;
 
-        <div class="progress-track">
-          <div
-            class="progress-fill"
-            style="width:${percent}%"
-          ></div>
-        </div>
+      requestAnimationFrame(() => {
+        const fill = container.querySelector(".progress-fill");
 
-        <div
-          style="
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            margin-top:14px;
-          "
-        >
-
-          <div
-            style="
-              color:var(--muted);
-              font-size:11px;
-            "
-          >
-            ${
-              goal.deadline
-                ? "Termin: " +
-                  escapeHTML(formatDate(goal.deadline))
-                : "Bez terminu"
-            }
-          </div>
-
-          <button
-            class="secondary-btn"
-            style="min-height:34px;padding:0 11px"
-            onclick="openGoalModal('${goal.id}')"
-          >
-            Edytuj
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }).join("");
-}
-
-
-/* ============================================================
-   NOTES
-   ============================================================ */
-
-function openNoteModal(id = null) {
-  const existing =
-    state.notes.find(note => note.id === id);
-
-  editingId = id;
-
-  openModal(
-    existing ? "Edytuj notatkę" : "Nowa notatka",
-    `
-      <form onsubmit="saveNote(event)">
-
-        <div class="form-group">
-          <label class="form-label">
-            Tytuł
-          </label>
-
-          <input
-            id="noteTitle"
-            type="text"
-            placeholder="Np. Pomysł na jutro"
-            value="${existing ? escapeHTML(existing.title) : ""}"
-            required
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            Treść
-          </label>
-
-          <textarea
-            id="noteContent"
-            placeholder="Napisz tutaj..."
-            required
-          >${existing ? escapeHTML(existing.content) : ""}</textarea>
-        </div>
-
-        <button
-          class="primary-btn"
-          style="width:100%"
-          type="submit"
-        >
-          Zapisz notatkę
-        </button>
-
-        ${
-          existing
-            ? `
-              <button
-                class="secondary-btn danger-btn"
-                style="width:100%;margin-top:9px"
-                type="button"
-                onclick="deleteNote('${existing.id}')"
-              >
-                Usuń notatkę
-              </button>
-            `
-            : ""
+        if (fill) {
+          setTimeout(() => {
+            fill.style.width = `${percent}%`;
+          }, 60);
         }
+      });
+    }
 
-      </form>
-    `
-  );
-}
 
-function saveNote(event) {
-  event.preventDefault();
+    /* ============================================================
+       RECENT DAYS
+    ============================================================ */
 
-  const title =
-    document.getElementById("noteTitle").value.trim();
+    function renderRecentDays() {
+      const container = document.getElementById("recentDays");
 
-  const content =
-    document.getElementById("noteContent").value.trim();
+      const days = [...state.days]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 5);
 
-  if (!title || !content) {
-    return;
-  }
+      if (!days.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Jeszcze nie ma żadnych zapisanych dni.
+          </div>
+        `;
 
-  if (editingId) {
+        return;
+      }
 
-    const index =
-      state.notes.findIndex(
-        note => note.id === editingId
-      );
-
-    state.notes[index] = {
-      ...state.notes[index],
-      title,
-      content
-    };
-
-  } else {
-
-    state.notes.unshift({
-      id: uid(),
-      title,
-      content,
-      createdAt: new Date().toISOString()
-    });
-
-  }
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Notatka zapisana ✓");
-}
-
-function deleteNote(id) {
-  if (!confirm("Usunąć notatkę?")) {
-    return;
-  }
-
-  state.notes =
-    state.notes.filter(note => note.id !== id);
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Notatka usunięta");
-}
-
-function renderNotes() {
-  const container =
-    document.getElementById("notesList");
-
-  if (!state.notes.length) {
-    container.innerHTML = `
-      <div class="card">
-        <div class="empty">
-          <div class="empty-icon">✎</div>
-          Brak notatek.
-        </div>
-      </div>
-    `;
-
-  } else {
-
-    container.innerHTML =
-      state.notes.map(note => `
-        <div class="list-item">
-
-          <div class="list-item-content">
-
-            <div class="list-item-title">
-              ${escapeHTML(note.title)}
+      container.innerHTML = days.map(day => `
+        <div
+          class="card list-item pressable"
+          onclick="openDayModal('${day.id}')"
+        >
+          <div class="list-main">
+            <div class="list-title">
+              ${escapeHTML(formatDate(day.date))}
             </div>
 
-            <div
-              style="
-                color:#b8b8c2;
-                font-size:12px;
-                line-height:1.5;
-                margin-top:6px;
-                white-space:pre-wrap;
-              "
-            >
-              ${escapeHTML(note.content)}
+            <div class="list-sub">
+              ${day.note
+                ? escapeHTML(day.note)
+                : "Brak notatki"}
             </div>
-
           </div>
 
-          <div class="list-item-actions">
-
-            <button
-              class="icon-btn"
-              onclick="openNoteModal('${note.id}')"
-            >
-              ✎
-            </button>
-
+          <div class="list-value green">
+            +${formatMoney(day.money)}
           </div>
-
         </div>
       `).join("");
-  }
-
-  renderQuotes();
-}
+    }
 
 
-/* ============================================================
-   QUOTES
-   ============================================================ */
+    /* ============================================================
+       QUOTE
+    ============================================================ */
 
-function openQuoteModal(id = null) {
-  const existing =
-    state.quotes.find(quote => quote.id === id);
+    function renderHomeQuote() {
+      const container = document.getElementById("homeQuote");
 
-  editingId = id;
+      if (!state.quotes.length) {
+        container.innerHTML = "";
+        return;
+      }
 
-  openModal(
-    existing ? "Edytuj cytat" : "Nowy cytat",
-    `
-      <form onsubmit="saveQuote(event)">
+      const quote =
+        state.quotes[
+          Math.floor(Date.now() / 86400000) %
+          state.quotes.length
+        ];
 
-        <div class="form-group">
-          <label class="form-label">
-            Cytat
-          </label>
+      container.innerHTML = `
+        <div class="card quote-card">
+          <div class="quote-mark">“</div>
 
-          <textarea
-            id="quoteText"
-            placeholder="Wpisz swój cytat..."
-            required
-          >${existing ? escapeHTML(existing.text) : ""}</textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            Autor — opcjonalnie
-          </label>
-
-          <input
-            id="quoteAuthor"
-            type="text"
-            placeholder="Np. Elon Musk"
-            value="${existing ? escapeHTML(existing.author || "") : ""}"
-          >
-        </div>
-
-        <button
-          class="primary-btn"
-          style="width:100%"
-          type="submit"
-        >
-          Zapisz cytat
-        </button>
-
-        ${
-          existing
-            ? `
-              <button
-                class="secondary-btn danger-btn"
-                style="width:100%;margin-top:9px"
-                type="button"
-                onclick="deleteQuote('${existing.id}')"
-              >
-                Usuń cytat
-              </button>
-            `
-            : ""
-        }
-
-      </form>
-    `
-  );
-}
-
-function saveQuote(event) {
-  event.preventDefault();
-
-  const text =
-    document.getElementById("quoteText").value.trim();
-
-  const author =
-    document.getElementById("quoteAuthor").value.trim();
-
-  if (!text) {
-    return;
-  }
-
-  if (editingId) {
-
-    const index =
-      state.quotes.findIndex(
-        quote => quote.id === editingId
-      );
-
-    state.quotes[index] = {
-      ...state.quotes[index],
-      text,
-      author
-    };
-
-  } else {
-
-    state.quotes.push({
-      id: uid(),
-      text,
-      author
-    });
-
-  }
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Cytat zapisany ✓");
-}
-
-function deleteQuote(id) {
-  if (!confirm("Usunąć cytat?")) {
-    return;
-  }
-
-  state.quotes =
-    state.quotes.filter(
-      quote => quote.id !== id
-    );
-
-  saveState();
-  closeModal();
-  renderAll();
-
-  showToast("Cytat usunięty");
-}
-
-function renderQuotes() {
-  const container =
-    document.getElementById("quotesList");
-
-  if (!state.quotes.length) {
-    container.innerHTML = `
-      <div class="card">
-        <div class="empty">
-          <div class="empty-icon">“</div>
-          Dodaj cytat, który chcesz widzieć.
-        </div>
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML =
-    state.quotes.map(quote => `
-      <div class="list-item">
-
-        <div class="list-item-content">
-
-          <div
-            style="
-              font-size:13px;
-              line-height:1.5;
-              font-weight:650;
-            "
-          >
-            “${escapeHTML(quote.text)}”
+          <div class="quote-text">
+            ${escapeHTML(quote.text)}
           </div>
 
           ${
             quote.author
-              ? `
-                <div class="list-item-meta">
-                  — ${escapeHTML(quote.author)}
-                </div>
-              `
+              ? `<div class="quote-author">
+                   — ${escapeHTML(quote.author)}
+                 </div>`
+              : ""
+          }
+        </div>
+      `;
+    }
+
+
+    /* ============================================================
+       DAY MODAL
+    ============================================================ */
+
+    function openDayModal(id = null) {
+      const existing = id
+        ? state.days.find(day => day.id === id)
+        : null;
+
+      currentModal = {
+        type: "day",
+        id
+      };
+
+      document.getElementById("modalTitle").textContent =
+        existing ? "Edytuj dzień" : "Dodaj dzień";
+
+      document.getElementById("modalContent").innerHTML = `
+        <div class="field">
+          <label>Data</label>
+          <input
+            type="date"
+            id="dayDate"
+            value="${existing?.date || todayISO()}"
+          />
+        </div>
+
+        <div class="field">
+          <label>Zarobek</label>
+          <input
+            type="number"
+            id="dayMoney"
+            inputmode="decimal"
+            step="0.01"
+            min="0"
+            placeholder="np. 250"
+            value="${existing?.money ?? ""}"
+          />
+        </div>
+
+        <div class="field">
+          <label>Notatka</label>
+          <textarea
+            id="dayNote"
+            placeholder="Co zrobiłeś dzisiaj?"
+          >${escapeHTML(existing?.note || "")}</textarea>
+        </div>
+
+        <div class="modal-actions">
+          ${
+            existing
+              ? `<button
+                   class="small-btn danger-btn"
+                   onclick="deleteDay('${existing.id}')"
+                 >
+                   Usuń
+                 </button>`
               : ""
           }
 
+          <button
+            class="primary-btn"
+            onclick="saveDay()"
+          >
+            Zapisz
+          </button>
+        </div>
+      `;
+
+      openModal();
+    }
+
+    function saveDay() {
+      const date = document.getElementById("dayDate").value;
+      const money = Number(
+        document.getElementById("dayMoney").value
+      );
+      const note =
+        document.getElementById("dayNote").value.trim();
+
+      if (!date) {
+        showToast("Wybierz datę.");
+        return;
+      }
+
+      if (!Number.isFinite(money) || money < 0) {
+        showToast("Podaj poprawną kwotę.");
+        return;
+      }
+
+      const duplicate = state.days.find(
+        day =>
+          day.date === date &&
+          day.id !== currentModal.id
+      );
+
+      if (duplicate) {
+        duplicate.money = money;
+        duplicate.note = note;
+      } else if (currentModal.id) {
+        const day = state.days.find(
+          item => item.id === currentModal.id
+        );
+
+        if (day) {
+          day.date = date;
+          day.money = money;
+          day.note = note;
+        }
+      } else {
+        state.days.push({
+          id: uid(),
+          date,
+          money,
+          note
+        });
+      }
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Dzień zapisany ✨");
+    }
+
+    function deleteDay(id) {
+      if (!confirm("Usunąć ten dzień?")) return;
+
+      state.days = state.days.filter(
+        day => day.id !== id
+      );
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Dzień usunięty.");
+    }
+
+
+    /* ============================================================
+       HISTORY
+    ============================================================ */
+
+    function renderHistory() {
+      animateMoney(
+        document.getElementById("historyTotal"),
+        calculateTotal()
+      );
+
+      const container = document.getElementById("historyList");
+
+      const days = [...state.days]
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      if (!days.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Historia jest jeszcze pusta.
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML = days.map(day => `
+        <div
+          class="card list-item pressable"
+          onclick="openDayModal('${day.id}')"
+        >
+          <div class="list-main">
+            <div class="list-title">
+              ${escapeHTML(formatFullDate(day.date))}
+            </div>
+
+            <div class="list-sub">
+              ${day.note
+                ? escapeHTML(day.note)
+                : "Bez notatki"}
+            </div>
+          </div>
+
+          <div class="list-value green">
+            +${formatMoney(day.money)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+
+    /* ============================================================
+       GOALS
+    ============================================================ */
+
+    function openGoalModal(id = null) {
+      const existing = id
+        ? state.goals.find(goal => goal.id === id)
+        : null;
+
+      currentModal = {
+        type: "goal",
+        id
+      };
+
+      document.getElementById("modalTitle").textContent =
+        existing ? "Edytuj cel" : "Nowy cel";
+
+      document.getElementById("modalContent").innerHTML = `
+        <div class="field">
+          <label>Nazwa celu</label>
+          <input
+            id="goalName"
+            placeholder="np. Nowy samochód"
+            value="${escapeHTML(existing?.name || "")}"
+          />
         </div>
 
-        <button
-          class="icon-btn"
+        <div class="field">
+          <label>Aktualnie</label>
+          <input
+            id="goalCurrent"
+            type="number"
+            inputmode="decimal"
+            step="0.01"
+            min="0"
+            value="${existing?.current ?? ""}"
+          />
+        </div>
+
+        <div class="field">
+          <label>Cel</label>
+          <input
+            id="goalTarget"
+            type="number"
+            inputmode="decimal"
+            step="0.01"
+            min="0"
+            value="${existing?.target ?? ""}"
+          />
+        </div>
+
+        <div class="field">
+          <label>Deadline</label>
+          <input
+            id="goalDeadline"
+            type="date"
+            value="${existing?.deadline || ""}"
+          />
+        </div>
+
+        <div class="modal-actions">
+          ${
+            existing
+              ? `<button
+                   class="small-btn danger-btn"
+                   onclick="deleteGoal('${existing.id}')"
+                 >
+                   Usuń
+                 </button>`
+              : ""
+          }
+
+          <button
+            class="primary-btn"
+            onclick="saveGoal()"
+          >
+            Zapisz
+          </button>
+        </div>
+      `;
+
+      openModal();
+    }
+
+    function saveGoal() {
+      const name =
+        document.getElementById("goalName").value.trim();
+
+      const current =
+        Number(document.getElementById("goalCurrent").value);
+
+      const target =
+        Number(document.getElementById("goalTarget").value);
+
+      const deadline =
+        document.getElementById("goalDeadline").value;
+
+      if (!name) {
+        showToast("Podaj nazwę celu.");
+        return;
+      }
+
+      if (
+        !Number.isFinite(current) ||
+        !Number.isFinite(target) ||
+        target <= 0
+      ) {
+        showToast("Podaj poprawny cel.");
+        return;
+      }
+
+      if (current < 0) {
+        showToast("Aktualna wartość nie może być ujemna.");
+        return;
+      }
+
+      if (currentModal.id) {
+        const goal = state.goals.find(
+          item => item.id === currentModal.id
+        );
+
+        if (goal) {
+          goal.name = name;
+          goal.current = current;
+          goal.target = target;
+          goal.deadline = deadline;
+        }
+      } else {
+        state.goals.push({
+          id: uid(),
+          name,
+          current,
+          target,
+          deadline
+        });
+      }
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Cel zapisany 🎯");
+    }
+
+    function deleteGoal(id) {
+      if (!confirm("Usunąć ten cel?")) return;
+
+      state.goals = state.goals.filter(
+        goal => goal.id !== id
+      );
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Cel usunięty.");
+    }
+
+    function renderGoals() {
+      const container = document.getElementById("goalsList");
+
+      if (!state.goals.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Dodaj pierwszy cel i obserwuj jego progres.
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML = state.goals.map(goal => {
+        const current = Number(goal.current || 0);
+        const target = Number(goal.target || 0);
+
+        const percent = target
+          ? Math.min(100, Math.max(0, current / target * 100))
+          : 0;
+
+        const remaining = Math.max(0, target - current);
+
+        return `
+          <div class="card goal-card">
+
+            <div class="goal-head">
+              <div>
+                <div class="goal-name">
+                  ${escapeHTML(goal.name)}
+                </div>
+
+                <div class="goal-meta" style="justify-content:flex-start;gap:7px">
+                  <span>${formatMoney(current)}</span>
+                  <span>/</span>
+                  <span>${formatMoney(target)}</span>
+                </div>
+              </div>
+
+              <div class="goal-percent">
+                ${Math.round(percent)}%
+              </div>
+            </div>
+
+            <div class="progress">
+              <div
+                class="progress-fill"
+                style="width:0"
+                data-progress="${percent}"
+              ></div>
+            </div>
+
+            <div class="goal-meta">
+              <span>
+                ${
+                  remaining > 0
+                    ? `Pozostało ${formatMoney(remaining)}`
+                    : "Cel osiągnięty 🎉"
+                }
+              </span>
+
+              <span>
+                ${
+                  goal.deadline
+                    ? escapeHTML(formatDate(goal.deadline))
+                    : "Bez deadline"
+                }
+              </span>
+            </div>
+
+            <div class="goal-actions">
+              <button
+                class="icon-btn"
+                onclick="openGoalModal('${goal.id}')"
+              >
+                ✎
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join("");
+
+      requestAnimationFrame(() => {
+        container
+          .querySelectorAll(".progress-fill")
+          .forEach(fill => {
+            setTimeout(() => {
+              fill.style.width =
+                `${fill.dataset.progress}%`;
+            }, 60);
+          });
+      });
+    }
+
+
+    /* ============================================================
+       NOTES
+    ============================================================ */
+
+    function openNoteModal(id = null) {
+      const existing = id
+        ? state.notes.find(note => note.id === id)
+        : null;
+
+      currentModal = {
+        type: "note",
+        id
+      };
+
+      document.getElementById("modalTitle").textContent =
+        existing ? "Edytuj notatkę" : "Nowa notatka";
+
+      document.getElementById("modalContent").innerHTML = `
+        <div class="field">
+          <label>Tytuł</label>
+          <input
+            id="noteTitle"
+            placeholder="np. Dzisiejsza lekcja"
+            value="${escapeHTML(existing?.title || "")}"
+          />
+        </div>
+
+        <div class="field">
+          <label>Treść</label>
+          <textarea
+            id="noteContent"
+            placeholder="Zapisz swoje przemyślenia..."
+          >${escapeHTML(existing?.content || "")}</textarea>
+        </div>
+
+        <div class="modal-actions">
+          ${
+            existing
+              ? `<button
+                   class="small-btn danger-btn"
+                   onclick="deleteNote('${existing.id}')"
+                 >
+                   Usuń
+                 </button>`
+              : ""
+          }
+
+          <button
+            class="primary-btn"
+            onclick="saveNote()"
+          >
+            Zapisz
+          </button>
+        </div>
+      `;
+
+      openModal();
+    }
+
+    function saveNote() {
+      const title =
+        document.getElementById("noteTitle").value.trim();
+
+      const content =
+        document.getElementById("noteContent").value.trim();
+
+      if (!title && !content) {
+        showToast("Dodaj treść notatki.");
+        return;
+      }
+
+      if (currentModal.id) {
+        const note = state.notes.find(
+          item => item.id === currentModal.id
+        );
+
+        if (note) {
+          note.title = title || "Bez tytułu";
+          note.content = content;
+        }
+      } else {
+        state.notes.unshift({
+          id: uid(),
+          title: title || "Bez tytułu",
+          content,
+          createdAt: Date.now()
+        });
+      }
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Notatka zapisana ✨");
+    }
+
+    function deleteNote(id) {
+      if (!confirm("Usunąć tę notatkę?")) return;
+
+      state.notes = state.notes.filter(
+        note => note.id !== id
+      );
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Notatka usunięta.");
+    }
+
+    function renderNotes() {
+      const container = document.getElementById("notesList");
+
+      if (!state.notes.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Nie masz jeszcze żadnych notatek.
+          </div>
+        `;
+      } else {
+        container.innerHTML = state.notes.map(note => `
+          <div
+            class="card note-card pressable"
+            onclick="openNoteModal('${note.id}')"
+          >
+            <div class="note-title">
+              ${escapeHTML(note.title)}
+            </div>
+
+            <div class="note-content">
+              ${escapeHTML(note.content)}
+            </div>
+          </div>
+        `).join("");
+      }
+
+      renderQuotes();
+    }
+
+
+    /* ============================================================
+       QUOTES
+    ============================================================ */
+
+    function openQuoteModal(id = null) {
+      const existing = id
+        ? state.quotes.find(quote => quote.id === id)
+        : null;
+
+      currentModal = {
+        type: "quote",
+        id
+      };
+
+      document.getElementById("modalTitle").textContent =
+        existing ? "Edytuj cytat" : "Nowy cytat";
+
+      document.getElementById("modalContent").innerHTML = `
+        <div class="field">
+          <label>Cytat</label>
+          <textarea
+            id="quoteText"
+            placeholder="Wpisz cytat..."
+          >${escapeHTML(existing?.text || "")}</textarea>
+        </div>
+
+        <div class="field">
+          <label>Autor</label>
+          <input
+            id="quoteAuthor"
+            placeholder="np. James Clear"
+            value="${escapeHTML(existing?.author || "")}"
+          />
+        </div>
+
+        <div class="modal-actions">
+          ${
+            existing
+              ? `<button
+                   class="small-btn danger-btn"
+                   onclick="deleteQuote('${existing.id}')"
+                 >
+                   Usuń
+                 </button>`
+              : ""
+          }
+
+          <button
+            class="primary-btn"
+            onclick="saveQuote()"
+          >
+            Zapisz
+          </button>
+        </div>
+      `;
+
+      openModal();
+    }
+
+    function saveQuote() {
+      const text =
+        document.getElementById("quoteText").value.trim();
+
+      const author =
+        document.getElementById("quoteAuthor").value.trim();
+
+      if (!text) {
+        showToast("Wpisz cytat.");
+        return;
+      }
+
+      if (currentModal.id) {
+        const quote = state.quotes.find(
+          item => item.id === currentModal.id
+        );
+
+        if (quote) {
+          quote.text = text;
+          quote.author = author;
+        }
+      } else {
+        state.quotes.push({
+          id: uid(),
+          text,
+          author
+        });
+      }
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Cytat zapisany.");
+    }
+
+    function deleteQuote(id) {
+      if (!confirm("Usunąć ten cytat?")) return;
+
+      state.quotes = state.quotes.filter(
+        quote => quote.id !== id
+      );
+
+      saveState();
+      closeModal();
+      renderAll();
+
+      showToast("Cytat usunięty.");
+    }
+
+    function renderQuotes() {
+      const container = document.getElementById("quotesList");
+
+      if (!state.quotes.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Dodaj cytat, który będzie Cię napędzał.
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML = state.quotes.map(quote => `
+        <div
+          class="card quote-card pressable"
           onclick="openQuoteModal('${quote.id}')"
         >
-          ✎
-        </button>
+          <div class="quote-mark">“</div>
 
-      </div>
-    `).join("");
-}
+          <div class="quote-text">
+            ${escapeHTML(quote.text)}
+          </div>
 
-
-/* ============================================================
-   MODAL
-   ============================================================ */
-
-function openModal(title, content) {
-  document.getElementById("modalTitle").textContent =
-    title;
-
-  document.getElementById("modalContent").innerHTML =
-    content;
-
-  document
-    .getElementById("modalBackdrop")
-    .classList.add("open");
-
-  document.body.style.overflow = "hidden";
-}
-
-function closeModal() {
-  document
-    .getElementById("modalBackdrop")
-    .classList.remove("open");
-
-  document.body.style.overflow = "";
-
-  editingId = null;
-}
-
-function backdropClick(event) {
-  if (
-    event.target ===
-    document.getElementById("modalBackdrop")
-  ) {
-    closeModal();
-  }
-}
+          ${
+            quote.author
+              ? `<div class="quote-author">
+                   — ${escapeHTML(quote.author)}
+                 </div>`
+              : ""
+          }
+        </div>
+      `).join("");
+    }
 
 
-/* ============================================================
-   INSTALL BANNER
-   ============================================================ */
+    /* ============================================================
+       CHART
+    ============================================================ */
 
-function closeInstallBanner() {
-  localStorage.setItem(
-    "progress_install_closed",
-    "1"
-  );
+    function getAmountForDate(date) {
+      const entry = state.days.find(
+        day => day.date === date
+      );
 
-  document
-    .getElementById("installBanner")
-    .classList.remove("show");
-}
+      return entry
+        ? Number(entry.money || 0)
+        : 0;
+    }
 
-function setupInstallBanner() {
-  const isStandalone =
-    window.matchMedia(
-      "(display-mode: standalone)"
-    ).matches ||
-    window.navigator.standalone === true;
+    function getChartPeriodData(range) {
+      const dates = getLastNDates(range);
 
-  const closed =
-    localStorage.getItem(
-      "progress_install_closed"
-    );
+      const values = dates.map(date =>
+        getAmountForDate(date)
+      );
 
-  const isIOS =
-    /iphone|ipad|ipod/i.test(
-      navigator.userAgent
-    );
+      return {
+        dates,
+        values
+      };
+    }
 
-  if (
-    !isStandalone &&
-    isIOS &&
-    !closed
-  ) {
-    setTimeout(() => {
+    function getPreviousPeriodTotal(range) {
+      const dates = getLastNDates(range, range);
+
+      return dates.reduce(
+        (sum, date) =>
+          sum + getAmountForDate(date),
+        0
+      );
+    }
+
+    function setChartRange(range) {
+      chartRange = range;
+
       document
-        .getElementById("installBanner")
-        .classList.add("show");
-    }, 1500);
-  }
-}
+        .getElementById("chart7")
+        .classList.toggle("active", range === 7);
+
+      document
+        .getElementById("chart30")
+        .classList.toggle("active", range === 30);
+
+      renderChart();
+    }
+
+    function smoothLine(ctx, points) {
+      if (!points.length) return;
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+
+        const midX =
+          (current.x + next.x) / 2;
+
+        ctx.bezierCurveTo(
+          midX,
+          current.y,
+          midX,
+          next.y,
+          next.x,
+          next.y
+        );
+      }
+    }
+
+    function renderChart() {
+      const canvas =
+        document.getElementById("earningsChart");
+
+      const wrap =
+        document.getElementById("chartWrap");
+
+      if (!canvas || !wrap) return;
+
+      const rect = canvas.getBoundingClientRect();
+
+      if (!rect.width) return;
+
+      const ctx = canvas.getContext("2d");
+
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
+
+      const width = rect.width;
+      const height = 160;
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+      const data =
+        getChartPeriodData(chartRange);
+
+      const values = data.values;
+
+      const total =
+        values.reduce((sum, value) => sum + value, 0);
+
+      const previousTotal =
+        getPreviousPeriodTotal(chartRange);
+
+      const totalEl =
+        document.getElementById("chartTotal");
+
+      const changeEl =
+        document.getElementById("chartChange");
+
+      totalEl.textContent = formatMoney(total);
+
+      changeEl.className =
+        "chart-change neutral";
+
+      if (previousTotal > 0) {
+        const percent =
+          ((total - previousTotal) / previousTotal) * 100;
+
+        if (percent > 0.05) {
+          changeEl.textContent =
+            `↗ ${Math.abs(percent).toFixed(1).replace(".", ",")}% vs poprzedni okres`;
+
+          changeEl.className =
+            "chart-change positive";
+        } else if (percent < -0.05) {
+          changeEl.textContent =
+            `↘ ${Math.abs(percent).toFixed(1).replace(".", ",")}% vs poprzedni okres`;
+
+          changeEl.className =
+            "chart-change negative";
+        } else {
+          changeEl.textContent =
+            "Bez większej zmiany vs poprzedni okres";
+
+          changeEl.className =
+            "chart-change neutral";
+        }
+      } else {
+        changeEl.textContent =
+          `Ostatnie ${chartRange} dni`;
+
+        changeEl.className =
+          "chart-change neutral";
+      }
+
+      /* grid */
+
+      const paddingX = 5;
+      const paddingTop = 8;
+      const paddingBottom = 9;
+
+      const chartHeight =
+        height - paddingTop - paddingBottom;
+
+      const maxValue =
+        Math.max(...values, 1);
+
+      const niceMax =
+        maxValue * 1.18;
+
+      const points = values.map((value, index) => {
+        const x =
+          paddingX +
+          (index / Math.max(values.length - 1, 1)) *
+          (width - paddingX * 2);
+
+        const y =
+          paddingTop +
+          chartHeight -
+          (value / niceMax) *
+          chartHeight;
+
+        return {
+          x,
+          y,
+          value,
+          date: data.dates[index]
+        };
+      });
+
+      chartPoints = points;
+
+      /* horizontal guides */
+
+      ctx.save();
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,.055)";
+
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < 3; i++) {
+        const y =
+          paddingTop +
+          (chartHeight / 2) * i;
+
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+
+      /* area */
+
+      const areaGradient =
+        ctx.createLinearGradient(
+          0,
+          paddingTop,
+          0,
+          height
+        );
+
+      areaGradient.addColorStop(
+        0,
+        "rgba(155,92,255,.25)"
+      );
+
+      areaGradient.addColorStop(
+        .55,
+        "rgba(76,156,255,.07)"
+      );
+
+      areaGradient.addColorStop(
+        1,
+        "rgba(76,156,255,0)"
+      );
+
+      smoothLine(ctx, points);
+
+      ctx.lineTo(
+        points[points.length - 1].x,
+        height
+      );
+
+      ctx.lineTo(
+        points[0].x,
+        height
+      );
+
+      ctx.closePath();
+
+      ctx.fillStyle = areaGradient;
+      ctx.fill();
+
+      /* line */
+
+      const lineGradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          width,
+          0
+        );
+
+      lineGradient.addColorStop(
+        0,
+        "#9b5cff"
+      );
+
+      lineGradient.addColorStop(
+        .55,
+        "#ff4fd8"
+      );
+
+      lineGradient.addColorStop(
+        1,
+        "#4c9cff"
+      );
+
+      smoothLine(ctx, points);
+
+      ctx.strokeStyle = lineGradient;
+      ctx.lineWidth = 2.6;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke();
+
+      /* last point */
+
+      const last =
+        points[points.length - 1];
+
+      if (last) {
+        ctx.beginPath();
+        ctx.arc(
+          last.x,
+          last.y,
+          4,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(
+          last.x,
+          last.y,
+          8,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.strokeStyle =
+          "rgba(155,92,255,.35)";
+
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      renderChartLabels(data.dates);
+    }
+
+    function renderChartLabels(dates) {
+      const container =
+        document.getElementById("chartLabels");
+
+      if (!dates.length) {
+        container.innerHTML = "";
+        return;
+      }
+
+      let indexes;
+
+      if (dates.length === 7) {
+        indexes = [0, 2, 4, 6];
+      } else {
+        indexes = [0, 7, 14, 21, 29];
+      }
+
+      container.innerHTML = indexes.map(index => {
+        const iso = dates[index];
+
+        if (!iso) return "";
+
+        const date = dateFromISO(iso);
+
+        const label =
+          chartRange === 7
+            ? date.toLocaleDateString("pl-PL", {
+                weekday: "short"
+              }).replace(".", "")
+            : date.toLocaleDateString("pl-PL", {
+                day: "numeric",
+                month: "short"
+              });
+
+        return `<span>${label}</span>`;
+      }).join("");
+    }
+
+    function handleChartPointer(event) {
+      const canvas =
+        document.getElementById("earningsChart");
+
+      const wrap =
+        document.getElementById("chartWrap");
+
+      if (!canvas || !chartPoints.length) return;
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const x =
+        event.clientX - rect.left;
+
+      let closest =
+        chartPoints[0];
+
+      let distance =
+        Math.abs(x - closest.x);
+
+      for (const point of chartPoints) {
+        const currentDistance =
+          Math.abs(x - point.x);
+
+        if (currentDistance < distance) {
+          closest = point;
+          distance = currentDistance;
+        }
+      }
+
+      const tooltip =
+        document.getElementById("chartTooltip");
+
+      document.getElementById("tooltipDate").textContent =
+        formatFullDate(closest.date);
+
+      document.getElementById("tooltipMoney").textContent =
+        formatMoney(closest.value);
+
+      const tooltipWidth = 105;
+
+      let left =
+        closest.x - tooltipWidth / 2;
+
+      left = Math.max(
+        4,
+        Math.min(
+          wrap.clientWidth - tooltipWidth - 4,
+          left
+        )
+      );
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.display = "block";
+
+      drawActiveChartPoint(closest);
+    }
+
+    function drawActiveChartPoint(active) {
+      const canvas =
+        document.getElementById("earningsChart");
+
+      if (!canvas) return;
+
+      const ctx =
+        canvas.getContext("2d");
+
+      const dpr =
+        Math.min(
+          window.devicePixelRatio || 1,
+          2
+        );
+
+      const width =
+        canvas.clientWidth;
+
+      const height = 160;
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      /* redraw base chart */
+      renderChart();
+
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
+
+      /* guide */
+
+      ctx.beginPath();
+      ctx.moveTo(active.x, 8);
+      ctx.lineTo(active.x, height - 8);
+
+      ctx.strokeStyle =
+        "rgba(255,255,255,.12)";
+
+      ctx.lineWidth = 1;
+
+      ctx.stroke();
+
+      /* active point */
+
+      ctx.beginPath();
+      ctx.arc(
+        active.x,
+        active.y,
+        5,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(
+        active.x,
+        active.y,
+        10,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.strokeStyle =
+        "rgba(155,92,255,.28)";
+
+      ctx.lineWidth = 2;
+
+      ctx.stroke();
+    }
+
+    function hideChartTooltip() {
+      const tooltip =
+        document.getElementById("chartTooltip");
+
+      if (tooltip) {
+        tooltip.style.display = "none";
+      }
+
+      renderChart();
+    }
 
 
-/* ============================================================
-   PWA
-   ============================================================ */
+    /* ============================================================
+       MODAL
+    ============================================================ */
 
-function registerServiceWorker() {
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
+    function openModal() {
+      document
+        .getElementById("modalBackdrop")
+        .classList.add("open");
 
-      navigator.serviceWorker
-        .register("./sw.js")
-        .catch(error => {
-          console.log(
-            "Service Worker error:",
-            error
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      document
+        .getElementById("modalBackdrop")
+        .classList.remove("open");
+
+      document.body.style.overflow = "";
+
+      currentModal = null;
+    }
+
+    function backdropClose(event) {
+      if (
+        event.target ===
+        document.getElementById("modalBackdrop")
+      ) {
+        closeModal();
+      }
+    }
+
+
+    /* ============================================================
+       INSTALL BANNER
+    ============================================================ */
+
+    function setupInstallBanner() {
+      const isIOS =
+        /iphone|ipad|ipod/i.test(
+          navigator.userAgent
+        );
+
+      const isStandalone =
+        window.navigator.standalone === true ||
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches;
+
+      if (isIOS && !isStandalone) {
+        document
+          .getElementById("installBanner")
+          .classList.add("show");
+      }
+    }
+
+
+    /* ============================================================
+       SERVICE WORKER
+    ============================================================ */
+
+    function setupServiceWorker() {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./sw.js")
+          .catch(error => {
+            console.log(
+              "Service worker:",
+              error
+            );
+          });
+      }
+    }
+
+
+    /* ============================================================
+       RENDER
+    ============================================================ */
+
+    function renderAll() {
+      renderHeaderDate();
+      renderHome();
+      renderHistory();
+      renderGoals();
+      renderNotes();
+    }
+
+
+    /* ============================================================
+       CHART EVENTS
+    ============================================================ */
+
+    function setupChartEvents() {
+      const canvas =
+        document.getElementById("earningsChart");
+
+      if (!canvas) return;
+
+      canvas.addEventListener(
+        "pointermove",
+        handleChartPointer
+      );
+
+      canvas.addEventListener(
+        "pointerdown",
+        handleChartPointer
+      );
+
+      canvas.addEventListener(
+        "pointerleave",
+        hideChartTooltip
+      );
+
+      canvas.addEventListener(
+        "pointercancel",
+        hideChartTooltip
+      );
+
+      window.addEventListener(
+        "resize",
+        () => {
+          requestAnimationFrame(
+            renderChart
           );
+        }
+      );
+    }
+
+
+    /* ============================================================
+       INIT
+    ============================================================ */
+
+    function init() {
+      loadState();
+      renderAll();
+      setupInstallBanner();
+      setupServiceWorker();
+      setupChartEvents();
+
+      /* Default starter quote */
+      if (!state.quotes.length) {
+        state.quotes.push({
+          id: uid(),
+          text: "Nie musisz być lepszy od innych. Wystarczy, że jesteś lepszy niż wczoraj.",
+          author: ""
         });
 
-    });
-  }
-}
+        saveState();
+        renderHomeQuote();
+        renderQuotes();
+      }
+    }
 
-
-/* ============================================================
-   RENDER
-   ============================================================ */
-
-function renderAll() {
-  renderHome();
-  renderHistory();
-  renderGoals();
-  renderNotes();
-}
-
-
-/* ============================================================
-   INIT
-   ============================================================ */
-
-function init() {
-  loadState();
-
-  renderHeaderDate();
-  renderAll();
-
-  setupInstallBanner();
-  registerServiceWorker();
-}
-
-init();
-
-</script>
+    init();
+  </script>
 
 </body>
 </html>
