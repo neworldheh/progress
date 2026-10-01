@@ -590,6 +590,42 @@
       font-weight: 650;
     }
 
+    .goal-daily {
+      margin-top: 14px;
+      padding: 12px 13px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, rgba(155,92,255,.10), rgba(76,156,255,.055));
+      border: 1px solid rgba(155,92,255,.12);
+    }
+
+    .goal-daily.success {
+      color: var(--green);
+      background: rgba(57,217,138,.07);
+      border-color: rgba(57,217,138,.12);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .goal-daily-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .goal-daily-value {
+      margin-top: 4px;
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .goal-daily-sub {
+      margin-top: 3px;
+      color: var(--muted2);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
     .empty {
       color: var(--muted);
       font-size: 13px;
@@ -640,6 +676,10 @@
 
     .green {
       color: var(--green);
+    }
+
+    .negative-value {
+      color: var(--red);
     }
 
     .muted {
@@ -724,6 +764,30 @@
       display: flex;
       gap: 7px;
       margin-top: 15px;
+    }
+
+    .data-card {
+      padding: 18px;
+      margin-top: 4px;
+    }
+
+    .data-card-title {
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .data-card-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .data-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
     }
 
     .icon-btn {
@@ -1194,6 +1258,33 @@
 
       <div id="goalsList" class="list"></div>
 
+      <div class="section-title">Twoje dane</div>
+
+      <div class="card data-card">
+        <div class="data-card-title">Backup aplikacji</div>
+        <div class="data-card-sub">
+          Zapisz wszystkie dni, cele, notatki i cytaty do jednego pliku JSON.
+        </div>
+
+        <div class="data-actions">
+          <button class="small-btn" onclick="exportDataJSON()">
+            ↓ Eksportuj JSON
+          </button>
+
+          <button class="small-btn" onclick="document.getElementById('importFile').click()">
+            ↑ Importuj JSON
+          </button>
+        </div>
+
+        <input
+          id="importFile"
+          type="file"
+          accept="application/json,.json"
+          hidden
+          onchange="importDataJSON(event)"
+        />
+      </div>
+
     </section>
 
 
@@ -1332,6 +1423,95 @@
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function getExportPayload() {
+      return {
+        app: "Progress",
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        data: JSON.parse(JSON.stringify(state))
+      };
+    }
+
+    function exportDataJSON() {
+      const payload = getExportPayload();
+      const json = JSON.stringify(payload, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = todayISO();
+
+      a.href = url;
+      a.download = `progress-backup-${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      showToast("Backup JSON utworzony ✓");
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const incoming = parsed?.data ?? parsed;
+
+          if (!incoming || typeof incoming !== "object") {
+            throw new Error("Nieprawidłowy format");
+          }
+
+          const nextState = {
+            days: Array.isArray(incoming.days) ? incoming.days : [],
+            goals: Array.isArray(incoming.goals) ? incoming.goals : [],
+            notes: Array.isArray(incoming.notes) ? incoming.notes : [],
+            quotes: Array.isArray(incoming.quotes) ? incoming.quotes : []
+          };
+
+          const totalItems =
+            nextState.days.length +
+            nextState.goals.length +
+            nextState.notes.length +
+            nextState.quotes.length;
+
+          if (!confirm(
+            `Import zastąpi obecne dane.
+
+` +
+            `Znaleziono ${totalItems} elementów.
+
+` +
+            `Czy kontynuować?`
+          )) {
+            event.target.value = "";
+            return;
+          }
+
+          state = nextState;
+          saveState();
+          renderAll();
+
+          showToast("Dane przywrócone ✓");
+        } catch (error) {
+          console.error(error);
+          showToast("Nieprawidłowy plik JSON.");
+        } finally {
+          event.target.value = "";
+        }
+      };
+
+      reader.onerror = () => {
+        event.target.value = "";
+        showToast("Nie udało się odczytać pliku.");
+      };
+
+      reader.readAsText(file);
     }
 
     function uid() {
@@ -1768,8 +1948,10 @@
             </div>
           </div>
 
-          <div class="list-value green">
-            +${formatMoney(day.money)}
+          <div
+            class="list-value ${Number(day.money || 0) < 0 ? "negative-value" : "green"}"
+          >
+            ${Number(day.money || 0) > 0 ? "+" : ""}${formatMoney(day.money)}
           </div>
         </div>
       `).join("");
@@ -1899,57 +2081,85 @@
     }
 
     function saveDay() {
-      const date = document.getElementById("dayDate").value;
-      const money = Number(
-        document.getElementById("dayMoney").value
-      );
-      const note =
-        document.getElementById("dayNote").value.trim();
+  const date = document.getElementById("dayDate").value;
 
-      if (!date) {
-        showToast("Wybierz datę.");
-        return;
-      }
+  const money = Number(
+    document.getElementById("dayMoney").value
+  );
 
-      if (!Number.isFinite(money) || money < 0) {
-        showToast("Podaj poprawną kwotę.");
-        return;
-      }
+  const saved = Number(
+    document.getElementById("daySaved").value || 0
+  );
 
-      const duplicate = state.days.find(
-        day =>
-          day.date === date &&
-          day.id !== currentModal.id
-      );
+  const note =
+    document.getElementById("dayNote").value.trim();
 
-      if (duplicate) {
-        duplicate.money = money;
-        duplicate.note = note;
-      } else if (currentModal.id) {
-        const day = state.days.find(
-          item => item.id === currentModal.id
-        );
+  if (!date) {
+    showToast("Wybierz datę.");
+    return;
+  }
 
-        if (day) {
-          day.date = date;
-          day.money = money;
-          day.note = note;
-        }
-      } else {
-        state.days.push({
-          id: uid(),
-          date,
-          money,
-          note
-        });
-      }
+  if (!Number.isFinite(money)) {
+    showToast("Podaj poprawną kwotę.");
+    return;
+  }
 
-      saveState();
-      closeModal();
-      renderAll();
+  if (!Number.isFinite(saved) || saved < 0) {
+    showToast("Podaj poprawną kwotę oszczędności.");
+    return;
+  }
 
-      showToast("Dzień zapisany ✨");
+  /*
+    Nie pozwalamy odkładać więcej niż faktycznie
+    zarobiono. Przy stracie oszczędności muszą wynosić 0.
+  */
+  if (money <= 0 && saved > 0) {
+    showToast("Przy stracie nie możesz odkładać pieniędzy.");
+    return;
+  }
+
+  if (money > 0 && saved > money) {
+    showToast("Nie możesz odłożyć więcej niż zarobiłeś.");
+    return;
+  }
+
+  const duplicate = state.days.find(
+    day =>
+      day.date === date &&
+      day.id !== currentModal.id
+  );
+
+  if (duplicate) {
+    duplicate.money = money;
+    duplicate.saved = saved;
+    duplicate.note = note;
+  } else if (currentModal.id) {
+    const day = state.days.find(
+      item => item.id === currentModal.id
+    );
+
+    if (day) {
+      day.date = date;
+      day.money = money;
+      day.saved = saved;
+      day.note = note;
     }
+  } else {
+    state.days.push({
+      id: uid(),
+      date,
+      money,
+      saved,
+      note
+    });
+  }
+
+  saveState();
+  closeModal();
+  renderAll();
+
+  showToast("Dzień zapisany ✨");
+}
 
     function deleteDay(id) {
       if (!confirm("Usunąć ten dzień?")) return;
@@ -2008,8 +2218,10 @@
             </div>
           </div>
 
-          <div class="list-value green">
-            +${formatMoney(day.money)}
+          <div
+            class="list-value ${Number(day.money || 0) < 0 ? "negative-value" : "green"}"
+          >
+            ${Number(day.money || 0) > 0 ? "+" : ""}${formatMoney(day.money)}
           </div>
         </div>
       `).join("");
@@ -2174,6 +2386,39 @@
       showToast("Cel usunięty.");
     }
 
+    function getGoalDailyRequirement(goal) {
+      const current = Number(goal.current || 0);
+      const target = Number(goal.target || 0);
+      const remaining = Math.max(0, target - current);
+
+      if (!remaining) {
+        return {
+          remaining: 0,
+          days: 0,
+          daily: 0
+        };
+      }
+
+      if (!goal.deadline) {
+        return {
+          remaining,
+          days: null,
+          daily: null
+        };
+      }
+
+      const today = dateFromISO(todayISO());
+      const deadline = dateFromISO(goal.deadline);
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const days = Math.max(1, Math.ceil((deadline - today) / msPerDay));
+
+      return {
+        remaining,
+        days,
+        daily: remaining / days
+      };
+    }
+
     function renderGoals() {
       const container = document.getElementById("goalsList");
 
@@ -2243,6 +2488,40 @@
                 }
               </span>
             </div>
+
+            ${(() => {
+              const plan = getGoalDailyRequirement(goal);
+
+              if (plan.remaining <= 0) {
+                return `
+                  <div class="goal-daily success">
+                    ✓ Ten cel jest już osiągnięty
+                  </div>
+                `;
+              }
+
+              if (plan.daily === null) {
+                return `
+                  <div class="goal-daily">
+                    Ustaw deadline, aby zobaczyć ile trzeba średnio odkładać dziennie.
+                  </div>
+                `;
+              }
+
+              return `
+                <div class="goal-daily">
+                  <div class="goal-daily-label">
+                    Średnio dziennie do celu
+                  </div>
+                  <div class="goal-daily-value">
+                    ${formatMoney(plan.daily)}
+                  </div>
+                  <div class="goal-daily-sub">
+                    przez najbliższe ${plan.days} ${plan.days === 1 ? "dzień" : plan.days < 5 ? "dni" : "dni"}
+                  </div>
+                </div>
+              `;
+            })()}
 
             <div class="goal-actions">
               <button
@@ -2694,9 +2973,9 @@
       changeEl.className =
         "chart-change neutral";
 
-      if (previousTotal > 0) {
+      if (previousTotal !== 0) {
         const percent =
-          ((total - previousTotal) / previousTotal) * 100;
+          ((total - previousTotal) / Math.abs(previousTotal)) * 100;
 
         if (percent > 0.05) {
           changeEl.textContent =
@@ -2734,11 +3013,18 @@
       const chartHeight =
         height - paddingTop - paddingBottom;
 
-      const maxValue =
-        Math.max(...values, 1);
+      /*
+         Symetryczna skala wokół 0 sprawia, że strata naprawdę
+         opada poniżej linii zera, zamiast być ściskana do dołu.
+      */
+      const maxAbs = Math.max(
+        ...values.map(value => Math.abs(value)),
+        1
+      );
 
-      const niceMax =
-        maxValue * 1.18;
+      const niceMax = maxAbs * 1.18;
+      const zeroY = paddingTop + chartHeight / 2;
+      const halfHeight = chartHeight / 2;
 
       const points = values.map((value, index) => {
         const x =
@@ -2747,10 +3033,9 @@
           (width - paddingX * 2);
 
         const y =
-          paddingTop +
-          chartHeight -
+          zeroY -
           (value / niceMax) *
-          chartHeight;
+          halfHeight;
 
         return {
           x,
@@ -2762,23 +3047,23 @@
 
       chartPoints = points;
 
-      /* horizontal guides */
+      /* horizontal guides + zero line */
 
       ctx.save();
-
-      ctx.strokeStyle =
-        "rgba(255,255,255,.055)";
-
       ctx.lineWidth = 1;
 
-      for (let i = 0; i < 3; i++) {
+      for (const ratio of [0, .5, 1]) {
         const y =
           paddingTop +
-          (chartHeight / 2) * i;
+          chartHeight * ratio;
 
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
+        ctx.strokeStyle =
+          ratio === .5
+            ? "rgba(255,255,255,.14)"
+            : "rgba(255,255,255,.045)";
         ctx.stroke();
       }
 
@@ -2813,12 +3098,12 @@
 
       ctx.lineTo(
         points[points.length - 1].x,
-        height
+        zeroY
       );
 
       ctx.lineTo(
         points[0].x,
-        height
+        zeroY
       );
 
       ctx.closePath();
