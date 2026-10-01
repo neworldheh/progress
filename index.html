@@ -811,6 +811,183 @@
       padding: 18px;
     }
 
+    /* ---------- Daily plan ---------- */
+
+    .day-plan-card {
+      padding: 18px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(135, 105, 255, .13), transparent 42%),
+        rgba(255,255,255,.055);
+    }
+
+    .day-plan-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .day-plan-title {
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .day-plan-sub {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .day-plan-progress {
+      min-width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .day-plan-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .day-plan-copy-btn {
+      height: 42px;
+      padding: 0 11px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 13px;
+      background: rgba(255,255,255,.055);
+      color: rgba(255,255,255,.82);
+      font: inherit;
+      font-size: 10px;
+      font-weight: 750;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .18s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .day-plan-copy-btn:hover {
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.14);
+    }
+
+    .day-plan-copy-btn:active {
+      transform: scale(.94);
+    }
+
+    @media (max-width: 380px) {
+      .day-plan-head-actions { gap: 5px; }
+      .day-plan-copy-btn { padding: 0 9px; font-size: 9px; }
+    }
+
+
+    .day-plan-add {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .day-plan-input {
+      flex: 1;
+      min-width: 0;
+      height: 44px;
+      padding: 0 13px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.08);
+      color: white;
+      outline: none;
+    }
+
+    .day-plan-input:focus {
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.075);
+    }
+
+    .day-plan-add-btn {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      border: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,.11);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .day-plan-list {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .day-plan-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+      transition: .2s ease;
+    }
+
+    .day-plan-check {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.17);
+      background: transparent;
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .day-plan-item.done .day-plan-check {
+      background: rgba(255,255,255,.16);
+      border-color: rgba(255,255,255,.28);
+    }
+
+    .day-plan-text {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .day-plan-item.done .day-plan-text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .day-plan-delete {
+      width: 28px;
+      height: 28px;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.35);
+      cursor: pointer;
+      border-radius: 9px;
+    }
+
+    .day-plan-empty {
+      padding: 13px 2px 2px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .note-title {
       font-size: 15px;
       font-weight: 850;
@@ -1303,6 +1480,32 @@
         </button>
       </div>
 
+      <div class="card day-plan-card">
+        <div class="day-plan-head">
+          <div>
+            <div class="day-plan-title">Plan dnia</div>
+            <div class="day-plan-sub" id="dayPlanDate">Na dziś</div>
+          </div>
+
+          <div class="day-plan-head-actions">
+            <button class="day-plan-copy-btn" onclick="duplicateYesterdayPlan()" type="button">↗ Wczoraj</button>
+            <div class="day-plan-progress" id="dayPlanProgress">0%</div>
+          </div>
+        </div>
+
+        <div class="day-plan-add">
+          <input
+            class="day-plan-input"
+            id="dayPlanInput"
+            placeholder="Co chcesz dziś zrobić?"
+            onkeydown="if(event.key === 'Enter') addDayPlanItem()"
+          />
+          <button class="day-plan-add-btn" onclick="addDayPlanItem()" aria-label="Dodaj zadanie">+</button>
+        </div>
+
+        <div class="day-plan-list" id="dayPlanList"></div>
+      </div>
+
       <div id="notesList" class="list"></div>
 
       <div class="section-title">Cytaty</div>
@@ -1382,7 +1585,8 @@
       days: [],
       goals: [],
       notes: [],
-      quotes: []
+      quotes: [],
+      dayPlans: []
     };
 
     let currentModal = null;
@@ -1413,7 +1617,8 @@
             days: Array.isArray(parsed.days) ? parsed.days : [],
             goals: Array.isArray(parsed.goals) ? parsed.goals : [],
             notes: Array.isArray(parsed.notes) ? parsed.notes : [],
-            quotes: Array.isArray(parsed.quotes) ? parsed.quotes : []
+            quotes: Array.isArray(parsed.quotes) ? parsed.quotes : [],
+            dayPlans: Array.isArray(parsed.dayPlans) ? parsed.dayPlans : []
           };
         }
       } catch (error) {
@@ -1428,7 +1633,7 @@
     function getExportPayload() {
       return {
         app: "Progress",
-        version: 2,
+        version: 3,
         exportedAt: new Date().toISOString(),
         data: JSON.parse(JSON.stringify(state))
       };
@@ -1471,14 +1676,16 @@
             days: Array.isArray(incoming.days) ? incoming.days : [],
             goals: Array.isArray(incoming.goals) ? incoming.goals : [],
             notes: Array.isArray(incoming.notes) ? incoming.notes : [],
-            quotes: Array.isArray(incoming.quotes) ? incoming.quotes : []
+            quotes: Array.isArray(incoming.quotes) ? incoming.quotes : [],
+            dayPlans: Array.isArray(incoming.dayPlans) ? incoming.dayPlans : []
           };
 
           const totalItems =
             nextState.days.length +
             nextState.goals.length +
             nextState.notes.length +
-            nextState.quotes.length;
+            nextState.quotes.length +
+            nextState.dayPlans.reduce((sum, plan) => sum + (Array.isArray(plan.items) ? plan.items.length : 0), 0);
 
           if (!confirm(
             `Import zastąpi obecne dane.
@@ -2550,6 +2757,121 @@
 
 
     /* ============================================================
+       DAILY PLAN
+    ============================================================ */
+
+    function getTodayPlan() {
+      const today = todayISO();
+      let plan = state.dayPlans.find(item => item.date === today);
+
+      if (!plan) {
+        plan = { id: uid(), date: today, items: [] };
+        state.dayPlans.push(plan);
+      }
+
+      if (!Array.isArray(plan.items)) plan.items = [];
+      return plan;
+    }
+
+    function addDayPlanItem() {
+      const input = document.getElementById("dayPlanInput");
+      const text = input?.value.trim();
+      if (!text) return;
+
+      const plan = getTodayPlan();
+      plan.items.push({
+        id: uid(),
+        text,
+        done: false
+      });
+
+      input.value = "";
+      saveState();
+      renderDayPlan();
+      input.focus();
+    }
+
+    function duplicateYesterdayPlan() {
+      const today = todayISO();
+      const yesterday = new Date();
+      yesterday.setHours(0, 0, 0, 0);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const source = state.dayPlans.find(plan => plan.date === dateToISO(yesterday));
+      if (!source || !Array.isArray(source.items) || !source.items.length) {
+        showToast("Wczoraj nie miałeś jeszcze planu.");
+        return;
+      }
+
+      const target = getTodayPlan();
+      const existingTexts = new Set(target.items.map(item => String(item.text || "").trim().toLowerCase()));
+      let copied = 0;
+
+      source.items.forEach(item => {
+        const taskText = String(item.text || "").trim();
+        if (!taskText) return;
+        const key = taskText.toLowerCase();
+        if (!existingTexts.has(key)) {
+          target.items.push({ id: uid(), text: taskText, done: false });
+          existingTexts.add(key);
+          copied++;
+        }
+      });
+
+      saveState();
+      renderDayPlan();
+      showToast(copied ? `Skopiowano ${copied} ${copied === 1 ? "zadanie" : "zadań"} z wczoraj ✓` : "Dzisiejszy plan już zawiera te zadania.");
+    }
+
+    function toggleDayPlanItem(id) {
+      const plan = getTodayPlan();
+      const item = plan.items.find(item => item.id === id);
+      if (!item) return;
+
+      item.done = !item.done;
+      saveState();
+      renderDayPlan();
+    }
+
+    function deleteDayPlanItem(id) {
+      const plan = getTodayPlan();
+      plan.items = plan.items.filter(item => item.id !== id);
+      saveState();
+      renderDayPlan();
+    }
+
+    function renderDayPlan() {
+      const list = document.getElementById("dayPlanList");
+      const progress = document.getElementById("dayPlanProgress");
+      const dateLabel = document.getElementById("dayPlanDate");
+      if (!list) return;
+
+      const plan = getTodayPlan();
+      const total = plan.items.length;
+      const done = plan.items.filter(item => item.done).length;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+
+      if (dateLabel) dateLabel.textContent = formatFullDate(todayISO());
+      if (progress) progress.textContent = `${percent}%`;
+
+      if (!total) {
+        list.innerHTML = `<div class="day-plan-empty">Dodaj kilka rzeczy, które chcesz dziś ogarnąć.</div>`;
+        return;
+      }
+
+      list.innerHTML = plan.items.map(item => `
+        <div class="day-plan-item ${item.done ? "done" : ""}">
+          <button class="day-plan-check" onclick="toggleDayPlanItem('${item.id}')" aria-label="Oznacz jako wykonane">
+            ${item.done ? "✓" : ""}
+          </button>
+          <div class="day-plan-text">${escapeHTML(item.text)}</div>
+          <button class="day-plan-delete" onclick="deleteDayPlanItem('${item.id}')" aria-label="Usuń">×</button>
+        </div>
+      `).join("");
+    }
+
+
+    /* ============================================================
        NOTES
     ============================================================ */
 
@@ -3458,6 +3780,7 @@
       renderHome();
       renderHistory();
       renderGoals();
+      renderDayPlan();
       renderNotes();
     }
 
