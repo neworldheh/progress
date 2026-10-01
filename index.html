@@ -1263,7 +1263,9 @@
         min-height: 115px;
       }
     }
-  </style>
+  
+    .plan-template-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:end center;padding:16px}.plan-template-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.56);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.plan-template-sheet{position:relative;width:min(100%,460px);max-height:78vh;overflow:auto;padding:18px;border-radius:28px;background:rgba(20,20,27,.84);border:1px solid rgba(255,255,255,.12);box-shadow:0 25px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);animation:planSheetIn .42s cubic-bezier(.22,1,.36,1)}@keyframes planSheetIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}.plan-template-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.plan-template-close{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);font-size:22px;cursor:pointer}.plan-template-list{display:grid;gap:8px;margin-bottom:14px}.plan-template-row{display:grid;grid-template-columns:24px 1fr 32px;align-items:center;gap:10px;min-height:48px;padding:7px 8px 7px 10px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}.plan-template-row>span{color:rgba(255,255,255,.35);font-size:11px;font-weight:800;text-align:center}.plan-template-row>div{font-size:13px;font-weight:650}.plan-template-row>button{width:30px;height:30px;border:0;border-radius:10px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.42);cursor:pointer;font-size:18px}.plan-template-add{display:grid;grid-template-columns:1fr auto;gap:8px}.plan-template-add input{min-width:0;height:46px;padding:0 14px;border-radius:15px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.055);color:white;outline:none}.plan-template-add button{height:46px;padding:0 16px;border:0;border-radius:15px;background:rgba(255,255,255,.14);color:white;font-weight:800;cursor:pointer}.plan-template-note,.plan-template-empty{margin-top:12px;color:rgba(255,255,255,.4);font-size:10px;line-height:1.45}.day-plan-template-hint{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4)}
+</style>
 </head>
 
 <body>
@@ -1488,7 +1490,7 @@
           </div>
 
           <div class="day-plan-head-actions">
-            <button class="day-plan-copy-btn" onclick="duplicateYesterdayPlan()" type="button">↗ Wczoraj</button>
+            <button class="day-plan-copy-btn" onclick="openPlanTemplateEditor()" type="button">✦ Edytuj plan</button>
             <div class="day-plan-progress" id="dayPlanProgress">0%</div>
           </div>
         </div>
@@ -1586,7 +1588,8 @@
       goals: [],
       notes: [],
       quotes: [],
-      dayPlans: []
+      dayPlans: [],
+      planTemplate: []
     };
 
     let currentModal = null;
@@ -1618,7 +1621,8 @@
             goals: Array.isArray(parsed.goals) ? parsed.goals : [],
             notes: Array.isArray(parsed.notes) ? parsed.notes : [],
             quotes: Array.isArray(parsed.quotes) ? parsed.quotes : [],
-            dayPlans: Array.isArray(parsed.dayPlans) ? parsed.dayPlans : []
+            dayPlans: Array.isArray(parsed.dayPlans) ? parsed.dayPlans : [],
+            planTemplate: Array.isArray(parsed.planTemplate) ? parsed.planTemplate : []
           };
         }
       } catch (error) {
@@ -1677,7 +1681,8 @@
             goals: Array.isArray(incoming.goals) ? incoming.goals : [],
             notes: Array.isArray(incoming.notes) ? incoming.notes : [],
             quotes: Array.isArray(incoming.quotes) ? incoming.quotes : [],
-            dayPlans: Array.isArray(incoming.dayPlans) ? incoming.dayPlans : []
+            dayPlans: Array.isArray(incoming.dayPlans) ? incoming.dayPlans : [],
+            planTemplate: Array.isArray(incoming.planTemplate) ? incoming.planTemplate : []
           };
 
           const totalItems =
@@ -2760,12 +2765,22 @@
        DAILY PLAN
     ============================================================ */
 
+    function getPlanTemplate() {
+      if (!Array.isArray(state.planTemplate)) state.planTemplate = [];
+      return state.planTemplate;
+    }
+
     function getTodayPlan() {
       const today = todayISO();
       let plan = state.dayPlans.find(item => item.date === today);
+      const template = getPlanTemplate();
 
       if (!plan) {
-        plan = { id: uid(), date: today, items: [] };
+        plan = {
+          id: uid(),
+          date: today,
+          items: template.map(item => ({ id: uid(), text: item.text, done: false }))
+        };
         state.dayPlans.push(plan);
       }
 
@@ -2773,22 +2788,61 @@
       return plan;
     }
 
+    function syncTodayFromTemplate() {
+      const plan = getTodayPlan();
+      const done = new Map(plan.items.map(item => [String(item.text).trim().toLowerCase(), !!item.done]));
+      plan.items = getPlanTemplate().map(item => ({
+        id: uid(),
+        text: item.text,
+        done: done.get(String(item.text).trim().toLowerCase()) || false
+      }));
+      saveState();
+    }
+
     function addDayPlanItem() {
       const input = document.getElementById("dayPlanInput");
       const text = input?.value.trim();
       if (!text) return;
-
-      const plan = getTodayPlan();
-      plan.items.push({
-        id: uid(),
-        text,
-        done: false
-      });
-
+      const template = getPlanTemplate();
+      if (template.some(item => String(item.text).trim().toLowerCase() === text.toLowerCase())) {
+        showToast("To zadanie jest już w stałym planie.");
+        return;
+      }
+      template.push({ id: uid(), text });
+      syncTodayFromTemplate();
       input.value = "";
-      saveState();
       renderDayPlan();
       input.focus();
+      showToast("Dodano do planu na każdy dzień ✓");
+    }
+
+    function openPlanTemplateEditor() {
+      const modal = document.createElement("div");
+      modal.className = "plan-template-modal";
+      modal.innerHTML = `
+        <div class="plan-template-backdrop"></div>
+        <div class="plan-template-sheet">
+          <div class="plan-template-top">
+            <div><div class="day-plan-title">Stały plan dnia</div><div class="day-plan-sub">Te zadania pojawią się każdego dnia.</div></div>
+            <button class="plan-template-close" type="button">×</button>
+          </div>
+          <div class="plan-template-list">
+            ${getPlanTemplate().map((item,i)=>`<div class="plan-template-row"><span>${i+1}</span><div>${escapeHTML(item.text)}</div><button type="button" data-remove="${item.id}">×</button></div>`).join("") || `<div class="plan-template-empty">Dodaj pierwsze zadanie poniżej.</div>`}
+          </div>
+          <div class="plan-template-add"><input id="planTemplateInput" maxlength="120" placeholder="np. trening, nauka, praca..."><button id="planTemplateAdd" type="button">Dodaj</button></div>
+          <div class="plan-template-note">✓ Lista zadań jest stała. Wykonanie resetuje się każdego dnia.</div>
+        </div>`;
+      document.body.appendChild(modal);
+      const close=()=>modal.remove();
+      modal.querySelector('.plan-template-backdrop').onclick=close;
+      modal.querySelector('.plan-template-close').onclick=close;
+      modal.querySelectorAll('[data-remove]').forEach(btn=>btn.onclick=()=>{
+        state.planTemplate=getPlanTemplate().filter(x=>x.id!==btn.dataset.remove);
+        syncTodayFromTemplate(); renderDayPlan(); close(); openPlanTemplateEditor();
+      });
+      const input=modal.querySelector('#planTemplateInput');
+      const add=()=>{ const v=input.value.trim(); if(!v)return; if(getPlanTemplate().some(x=>String(x.text).trim().toLowerCase()===v.toLowerCase())){showToast('To zadanie jest już w planie.');return;} state.planTemplate.push({id:uid(),text:v}); syncTodayFromTemplate(); renderDayPlan(); close(); openPlanTemplateEditor(); };
+      modal.querySelector('#planTemplateAdd').onclick=add; input.onkeydown=e=>{if(e.key==='Enter')add()}; input.focus();
     }
 
     function duplicateYesterdayPlan() {
@@ -2835,8 +2889,10 @@
 
     function deleteDayPlanItem(id) {
       const plan = getTodayPlan();
-      plan.items = plan.items.filter(item => item.id !== id);
-      saveState();
+      const item = plan.items.find(item => item.id === id);
+      if (!item) return;
+      state.planTemplate = getPlanTemplate().filter(t => String(t.text).trim().toLowerCase() !== String(item.text).trim().toLowerCase());
+      syncTodayFromTemplate();
       renderDayPlan();
     }
 
