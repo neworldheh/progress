@@ -459,6 +459,93 @@
       box-shadow: 0 3px 12px rgba(0,0,0,.18);
     }
 
+    .chart-mode-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .chart-mode {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 142px;
+      height: 34px;
+      padding: 3px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        0 8px 22px rgba(0,0,0,.12);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+
+    .chart-mode-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: calc(50% - 3px);
+      height: 26px;
+      border-radius: 9px;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 3px 12px rgba(0,0,0,.2),
+        inset 0 1px 0 rgba(255,255,255,.09);
+      transition: transform .28s cubic-bezier(.2,.8,.2,1);
+      pointer-events: none;
+    }
+
+    .chart-mode.balance .chart-mode-thumb {
+      transform: translateX(100%);
+    }
+
+    .chart-mode button {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      padding: 0 7px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: color .2s ease;
+    }
+
+    .chart-mode button.active {
+      color: #fff;
+    }
+
+    .chart-range {
+      display: flex;
+      gap: 2px;
+      padding: 2px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .chart-range button {
+      padding: 3px 6px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted2);
+      font-size: 9px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chart-range button.active {
+      color: rgba(255,255,255,.9);
+      background: rgba(255,255,255,.07);
+    }
+
     .chart-wrap {
       position: relative;
       height: 190px;
@@ -1265,6 +1352,247 @@
     }
   
     .plan-template-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:end center;padding:16px}.plan-template-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.56);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.plan-template-sheet{position:relative;width:min(100%,460px);max-height:78vh;overflow:auto;padding:18px;border-radius:28px;background:rgba(20,20,27,.84);border:1px solid rgba(255,255,255,.12);box-shadow:0 25px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);animation:planSheetIn .42s cubic-bezier(.22,1,.36,1)}@keyframes planSheetIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}.plan-template-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.plan-template-close{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);font-size:22px;cursor:pointer}.plan-template-list{display:grid;gap:8px;margin-bottom:14px}.plan-template-row{display:grid;grid-template-columns:24px 1fr 32px;align-items:center;gap:10px;min-height:48px;padding:7px 8px 7px 10px;border-radius:16px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}.plan-template-row>span{color:rgba(255,255,255,.35);font-size:11px;font-weight:800;text-align:center}.plan-template-row>div{font-size:13px;font-weight:650}.plan-template-row>button{width:30px;height:30px;border:0;border-radius:10px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.42);cursor:pointer;font-size:18px}.plan-template-add{display:grid;grid-template-columns:1fr auto;gap:8px}.plan-template-add input{min-width:0;height:46px;padding:0 14px;border-radius:15px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.055);color:white;outline:none}.plan-template-add button{height:46px;padding:0 16px;border:0;border-radius:15px;background:rgba(255,255,255,.14);color:white;font-weight:800;cursor:pointer}.plan-template-note,.plan-template-empty{margin-top:12px;color:rgba(255,255,255,.4);font-size:10px;line-height:1.45}.day-plan-template-hint{margin-top:4px;font-size:10px;color:rgba(255,255,255,.4)}
+
+/* ===== DARK PRO / PREMIUM OVERRIDES ===== */
+:root{
+  --bg:#050509;
+  --bg2:#090911;
+  --card:rgba(16,16,24,.72);
+  --card-strong:rgba(22,22,32,.86);
+  --border:rgba(255,255,255,.075);
+  --text:#f8f8fc;
+  --muted:#858596;
+  --muted2:#555565;
+  --purple:#9b63ff;
+  --pink:#ff4fd8;
+  --blue:#4d9cff;
+  --green:#48e39a;
+  --orange:#ffad62;
+  --red:#ff6279;
+  --radius:22px;
+  --shadow:0 24px 70px rgba(0,0,0,.42);
+}
+
+html,body{
+  background:#050509;
+}
+body{
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -8%,rgba(126,76,255,.13),transparent 65%),
+    radial-gradient(ellipse 50% 40% at 105% 30%,rgba(53,122,255,.07),transparent 65%),
+    radial-gradient(ellipse 45% 35% at -10% 80%,rgba(255,55,203,.055),transparent 65%),
+    #050509;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-2;
+  opacity:.22;
+  background-image:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent 72%);
+  -webkit-mask-image:linear-gradient(to bottom,black,transparent 72%);
+}
+
+.ambient{opacity:.085;filter:blur(105px)}
+.card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012) 55%),
+    rgba(10,10,17,.72);
+  border-color:rgba(255,255,255,.065);
+  box-shadow:0 22px 70px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.035);
+  backdrop-filter:blur(26px) saturate(135%);
+  -webkit-backdrop-filter:blur(26px) saturate(135%);
+}
+.card::after{
+  background:
+    radial-gradient(circle at 0 0,rgba(255,255,255,.055),transparent 30%),
+    linear-gradient(135deg,rgba(155,92,255,.025),transparent 45%);
+}
+.card.pressable:hover{
+  border-color:rgba(155,92,255,.14);
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012) 55%),rgba(11,11,18,.78);
+}
+.page-title{
+  text-shadow:0 8px 34px rgba(0,0,0,.45);
+}
+.brand{
+  letter-spacing:-.045em;
+}
+.brand-dot{
+  box-shadow:0 0 16px rgba(155,92,255,.75),0 0 34px rgba(255,79,216,.2);
+}
+.hero{
+  background:
+    radial-gradient(circle at 92% 10%,rgba(155,92,255,.11),transparent 32%),
+    radial-gradient(circle at 15% 100%,rgba(76,156,255,.06),transparent 35%),
+    linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012) 55%),
+    rgba(8,8,14,.78);
+}
+.hero-money{
+  filter:drop-shadow(0 10px 30px rgba(155,92,255,.16));
+}
+.primary-btn{
+  background:linear-gradient(135deg,#a267ff 0%,#7948eb 52%,#6336d2 100%);
+  box-shadow:0 10px 32px rgba(112,65,223,.32),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.primary-btn:hover{
+  box-shadow:0 12px 38px rgba(112,65,223,.46),inset 0 1px 0 rgba(255,255,255,.23);
+}
+.small-btn,.icon-btn{
+  background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.065);
+}
+.small-btn:hover,.icon-btn:hover{
+  background:rgba(255,255,255,.075);
+  border-color:rgba(255,255,255,.11);
+}
+.bottom-nav{
+  background:rgba(8,8,14,.76);
+  border-color:rgba(255,255,255,.075);
+  box-shadow:0 24px 70px rgba(0,0,0,.56),inset 0 1px 0 rgba(255,255,255,.045);
+  backdrop-filter:blur(30px) saturate(145%);
+  -webkit-backdrop-filter:blur(30px) saturate(145%);
+}
+.nav-btn.active{
+  background:linear-gradient(145deg,rgba(155,92,255,.13),rgba(255,255,255,.045));
+  box-shadow:inset 0 0 0 1px rgba(155,92,255,.09),0 6px 20px rgba(0,0,0,.16);
+}
+.nav-btn.active .nav-icon{
+  filter:drop-shadow(0 0 8px rgba(155,92,255,.5));
+}
+.progress{
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.3);
+}
+.progress-fill{
+  background:linear-gradient(90deg,#8e55ff,#d65ce9,#4f9fff);
+  box-shadow:0 0 20px rgba(155,92,255,.35);
+}
+.stat-value,.chart-total,.big-number-value{
+  text-shadow:0 8px 30px rgba(0,0,0,.35);
+}
+.modal-backdrop{
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(15px) saturate(120%);
+  -webkit-backdrop-filter:blur(15px) saturate(120%);
+}
+.modal{
+  background:
+    radial-gradient(circle at 90% 0%,rgba(155,92,255,.09),transparent 35%),
+    linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),
+    #0b0b12;
+  border-color:rgba(255,255,255,.09);
+  box-shadow:0 35px 110px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.045);
+}
+.field input,.field textarea,.day-plan-input,.plan-template-add input{
+  background:rgba(255,255,255,.035);
+  border-color:rgba(255,255,255,.065);
+}
+.field input:focus,.field textarea:focus,.day-plan-input:focus,.plan-template-add input:focus{
+  border-color:rgba(155,92,255,.45);
+  box-shadow:0 0 0 3px rgba(155,92,255,.07);
+  background:rgba(255,255,255,.05);
+}
+.chart-mode-wrap{
+  gap:7px;
+}
+.chart-mode{
+  background:rgba(255,255,255,.038)!important;
+  border-color:rgba(255,255,255,.06)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 5px 20px rgba(0,0,0,.15);
+}
+.chart-mode-thumb{
+  background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.075))!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.13)!important;
+}
+.chart-range{
+  background:rgba(255,255,255,.025)!important;
+}
+.note-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),
+    rgba(10,10,17,.72);
+}
+
+
+/* ===== COMPACT NOTE PINNING ===== */
+.note-card{
+  position:relative;
+  padding:15px 46px 15px 17px;
+}
+.note-pin{
+  position:absolute;
+  top:11px;
+  right:11px;
+  width:29px;
+  height:29px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:9px;
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.28);
+  font-size:13px;
+  line-height:1;
+  cursor:pointer;
+  z-index:3;
+  transition:.18s ease;
+}
+.note-pin:hover{
+  color:rgba(255,255,255,.75);
+  background:rgba(255,255,255,.07);
+}
+.note-pin.pinned{
+  color:#c9a8ff;
+  background:rgba(155,92,255,.12);
+  border-color:rgba(155,92,255,.18);
+  box-shadow:0 0 16px rgba(155,92,255,.12);
+}
+.note-card.pinned{
+  border-color:rgba(155,92,255,.14);
+  background:
+    radial-gradient(circle at 100% 0,rgba(155,92,255,.10),transparent 38%),
+    linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.012)),
+    rgba(10,10,17,.78);
+}
+.pinned-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-left:7px;
+  color:#b997ff;
+  font-size:9px;
+  font-weight:800;
+  vertical-align:middle;
+}
+.notes-filter{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:-4px 0 12px;
+}
+.notes-filter button{
+  height:30px;
+  padding:0 10px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:10px;
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.notes-filter button.active{
+  color:#fff;
+  background:rgba(155,92,255,.11);
+  border-color:rgba(155,92,255,.16);
+}
+
 </style>
 </head>
 
@@ -1330,20 +1658,20 @@
             </div>
           </div>
 
-          <div class="chart-toggle">
-            <button
-              id="chart7"
-              class="active"
-              onclick="setChartRange(7)"
-            >
-              7 dni
-            </button>
-            <button
-              id="chart30"
-              onclick="setChartRange(30)"
-            >
-              30 dni
-            </button>
+          <div class="chart-mode-wrap">
+            <div class="chart-mode" role="tablist" aria-label="Rodzaj wykresu">
+              <span class="chart-mode-thumb" id="chartModeThumb"></span>
+              <button id="chartModeEarnings" class="active" onclick="setChartMode('earnings')" role="tab">
+                Zarobki
+              </button>
+              <button id="chartModeBalance" onclick="setChartMode('balance')" role="tab">
+                Saldo
+              </button>
+            </div>
+            <div class="chart-range">
+              <button id="chart7" class="active" onclick="setChartRange(7)">7 dni</button>
+              <button id="chart30" onclick="setChartRange(30)">30 dni</button>
+            </div>
           </div>
         </div>
 
@@ -1508,6 +1836,11 @@
         <div class="day-plan-list" id="dayPlanList"></div>
       </div>
 
+      <div class="notes-filter" aria-label="Filtrowanie notatek">
+        <button id="notesFilterAll" class="active" onclick="setNotesFilter('all')">Wszystkie</button>
+        <button id="notesFilterPinned" onclick="setNotesFilter('pinned')">📌 Przypięte</button>
+      </div>
+
       <div id="notesList" class="list"></div>
 
       <div class="section-title">Cytaty</div>
@@ -1594,6 +1927,7 @@
 
     let currentModal = null;
     let chartRange = 7;
+    let chartMode = "earnings";
     let chartPoints = [];
 
     const moneyFormatter = new Intl.NumberFormat("pl-PL", {
@@ -1619,7 +1953,7 @@
           state = {
             days: Array.isArray(parsed.days) ? parsed.days : [],
             goals: Array.isArray(parsed.goals) ? parsed.goals : [],
-            notes: Array.isArray(parsed.notes) ? parsed.notes : [],
+            notes: Array.isArray(parsed.notes) ? parsed.notes.map(note => ({...note, pinned: !!note.pinned})) : [],
             quotes: Array.isArray(parsed.quotes) ? parsed.quotes : [],
             dayPlans: Array.isArray(parsed.dayPlans) ? parsed.dayPlans : [],
             planTemplate: Array.isArray(parsed.planTemplate) ? parsed.planTemplate : []
@@ -1679,7 +2013,7 @@
           const nextState = {
             days: Array.isArray(incoming.days) ? incoming.days : [],
             goals: Array.isArray(incoming.goals) ? incoming.goals : [],
-            notes: Array.isArray(incoming.notes) ? incoming.notes : [],
+            notes: Array.isArray(incoming.notes) ? incoming.notes.map(note => ({...note, pinned: !!note.pinned})) : [],
             quotes: Array.isArray(incoming.quotes) ? incoming.quotes : [],
             dayPlans: Array.isArray(incoming.dayPlans) ? incoming.dayPlans : [],
             planTemplate: Array.isArray(incoming.planTemplate) ? incoming.planTemplate : []
@@ -2468,6 +2802,19 @@
         </div>
 
         <div class="field">
+          <label>Saldo startowe</label>
+          <input
+            id="goalStart"
+            type="number"
+            inputmode="decimal"
+            step="0.01"
+            min="0.01"
+            placeholder="np. 50"
+            value="${existing?.startingBalance ?? existing?.current ?? ""}"
+          />
+        </div>
+
+        <div class="field">
           <label>Aktualnie</label>
           <input
             id="goalCurrent"
@@ -2528,6 +2875,9 @@
       const name =
         document.getElementById("goalName").value.trim();
 
+      const startingBalance =
+        Number(document.getElementById("goalStart").value);
+
       const current =
         Number(document.getElementById("goalCurrent").value);
 
@@ -2543,6 +2893,8 @@
       }
 
       if (
+        !Number.isFinite(startingBalance) ||
+        startingBalance <= 0 ||
         !Number.isFinite(current) ||
         !Number.isFinite(target) ||
         target <= 0
@@ -2563,6 +2915,7 @@
 
         if (goal) {
           goal.name = name;
+          goal.startingBalance = startingBalance;
           goal.current = current;
           goal.target = target;
           goal.deadline = deadline;
@@ -2571,6 +2924,7 @@
         state.goals.push({
           id: uid(),
           name,
+          startingBalance,
           current,
           target,
           deadline
@@ -3006,12 +3360,14 @@
         if (note) {
           note.title = title || "Bez tytułu";
           note.content = content;
+          note.pinned = !!note.pinned;
         }
       } else {
         state.notes.unshift({
           id: uid(),
           title: title || "Bez tytułu",
           content,
+          pinned: false,
           createdAt: Date.now()
         });
       }
@@ -3021,6 +3377,25 @@
       renderAll();
 
       showToast("Notatka zapisana ✨");
+    }
+
+    function toggleNotePin(id, event) {
+      if (event) event.stopPropagation();
+      const note = state.notes.find(item => item.id === id);
+      if (!note) return;
+      note.pinned = !note.pinned;
+      saveState();
+      renderNotes();
+      showToast(note.pinned ? "Notatka przypięta 📌" : "Notatka odpięta.");
+    }
+
+    let notesFilter = "all";
+
+    function setNotesFilter(filter) {
+      notesFilter = filter === "pinned" ? "pinned" : "all";
+      document.getElementById("notesFilterAll")?.classList.toggle("active", notesFilter === "all");
+      document.getElementById("notesFilterPinned")?.classList.toggle("active", notesFilter === "pinned");
+      renderNotes();
     }
 
     function deleteNote(id) {
@@ -3039,21 +3414,45 @@
 
     function renderNotes() {
       const container = document.getElementById("notesList");
+      const all = Array.isArray(state.notes) ? state.notes : [];
+      const notes = all
+        .filter(note => notesFilter !== "pinned" || note.pinned)
+        .sort((a,b) => {
+          if (!!b.pinned !== !!a.pinned) return Number(!!b.pinned) - Number(!!a.pinned);
+          return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+        });
 
-      if (!state.notes.length) {
+      document.getElementById("notesFilterAll")?.classList.toggle("active", notesFilter === "all");
+      document.getElementById("notesFilterPinned")?.classList.toggle("active", notesFilter === "pinned");
+
+      if (!all.length) {
         container.innerHTML = `
           <div class="card empty">
             Nie masz jeszcze żadnych notatek.
           </div>
         `;
+      } else if (!notes.length) {
+        container.innerHTML = `
+          <div class="card empty">
+            Nie masz jeszcze przypiętych notatek.
+          </div>
+        `;
       } else {
-        container.innerHTML = state.notes.map(note => `
+        container.innerHTML = notes.map(note => `
           <div
-            class="card note-card pressable"
+            class="card note-card pressable ${note.pinned ? "pinned" : ""}"
             onclick="openNoteModal('${note.id}')"
           >
+            <button
+              class="note-pin ${note.pinned ? "pinned" : ""}"
+              onclick="toggleNotePin('${note.id}', event)"
+              aria-label="${note.pinned ? "Odepnij notatkę" : "Przypnij notatkę"}"
+              title="${note.pinned ? "Odepnij" : "Przypnij"}"
+            >${note.pinned ? "📌" : "⌖"}</button>
+
             <div class="note-title">
               ${escapeHTML(note.title)}
+              ${note.pinned ? '<span class="pinned-badge">PRZYPINANA</span>' : ""}
             </div>
 
             <div class="note-content">
@@ -3065,7 +3464,6 @@
 
       renderQuotes();
     }
-
 
     /* ============================================================
        QUOTES
@@ -3226,27 +3624,68 @@
         : 0;
     }
 
-    function getChartPeriodData(range) {
+    function getChartPeriodData(range, mode = chartMode) {
       const dates = getLastNDates(range);
 
-      const values = dates.map(date =>
-        getAmountForDate(date)
-      );
+      if (mode === "balance") {
+        let running = state.days
+          .filter(day => day.date < dates[0])
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .reduce((sum, day) => sum + Number(day.money || 0), 0);
+
+        const values = dates.map(date => {
+          running += getAmountForDate(date);
+          return running;
+        });
+
+        return { dates, values };
+      }
 
       return {
         dates,
-        values
+        values: dates.map(date => getAmountForDate(date))
       };
     }
 
-    function getPreviousPeriodTotal(range) {
+    function getPreviousPeriodTotal(range, mode = chartMode) {
       const dates = getLastNDates(range, range);
 
+      if (mode === "balance") {
+        const previousDates = dates;
+        let running = state.days
+          .filter(day => day.date < previousDates[0])
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .reduce((sum, day) => sum + Number(day.money || 0), 0);
+
+        const previousValues = previousDates.map(date => {
+          running += getAmountForDate(date);
+          return running;
+        });
+
+        return previousValues.at(-1) || 0;
+      }
+
       return dates.reduce(
-        (sum, date) =>
-          sum + getAmountForDate(date),
+        (sum, date) => sum + getAmountForDate(date),
         0
       );
+    }
+
+    function setChartMode(mode) {
+      chartMode = mode === "balance" ? "balance" : "earnings";
+
+      const modeWrap = document.querySelector(".chart-mode");
+      const earningsBtn = document.getElementById("chartModeEarnings");
+      const balanceBtn = document.getElementById("chartModeBalance");
+      const label = document.querySelector(".chart-label");
+
+      if (modeWrap) modeWrap.classList.toggle("balance", chartMode === "balance");
+      if (earningsBtn) earningsBtn.classList.toggle("active", chartMode === "earnings");
+      if (balanceBtn) balanceBtn.classList.toggle("active", chartMode === "balance");
+
+      if (label) label.textContent = chartMode === "balance" ? "Saldo" : "Zarobki";
+
+      renderChart();
     }
 
     function setChartRange(range) {
@@ -3334,11 +3773,8 @@
 
       const values = data.values;
 
-      const total =
-        values.reduce((sum, value) => sum + value, 0);
-
       const previousTotal =
-        getPreviousPeriodTotal(chartRange);
+        getPreviousPeriodTotal(chartRange, chartMode);
 
       const totalEl =
         document.getElementById("chartTotal");
@@ -3346,40 +3782,40 @@
       const changeEl =
         document.getElementById("chartChange");
 
-      totalEl.textContent = formatMoney(total);
+      const headlineValue = chartMode === "balance"
+        ? (values.at(-1) || 0)
+        : values.reduce((sum, value) => sum + value, 0);
+
+      totalEl.textContent = formatMoney(headlineValue);
 
       changeEl.className =
         "chart-change neutral";
 
       if (previousTotal !== 0) {
+        const currentComparable = chartMode === "balance"
+          ? (values.at(-1) || 0)
+          : values.reduce((sum, value) => sum + value, 0);
+
         const percent =
-          ((total - previousTotal) / Math.abs(previousTotal)) * 100;
+          ((currentComparable - previousTotal) / Math.abs(previousTotal)) * 100;
 
         if (percent > 0.05) {
           changeEl.textContent =
             `↗ ${Math.abs(percent).toFixed(1).replace(".", ",")}% vs poprzedni okres`;
-
-          changeEl.className =
-            "chart-change positive";
+          changeEl.className = "chart-change positive";
         } else if (percent < -0.05) {
           changeEl.textContent =
             `↘ ${Math.abs(percent).toFixed(1).replace(".", ",")}% vs poprzedni okres`;
-
-          changeEl.className =
-            "chart-change negative";
+          changeEl.className = "chart-change negative";
         } else {
           changeEl.textContent =
             "Bez większej zmiany vs poprzedni okres";
-
-          changeEl.className =
-            "chart-change neutral";
         }
       } else {
         changeEl.textContent =
-          `Ostatnie ${chartRange} dni`;
-
-        changeEl.className =
-          "chart-change neutral";
+          chartMode === "balance"
+            ? `Saldo na koniec • ${chartRange} dni`
+            : `Ostatnie ${chartRange} dni`;
       }
 
       /* grid */
@@ -3391,18 +3827,8 @@
       const chartHeight =
         height - paddingTop - paddingBottom;
 
-      /*
-         Symetryczna skala wokół 0 sprawia, że strata naprawdę
-         opada poniżej linii zera, zamiast być ściskana do dołu.
-      */
-      const maxAbs = Math.max(
-        ...values.map(value => Math.abs(value)),
-        1
-      );
-
-      const niceMax = maxAbs * 1.18;
-      const zeroY = paddingTop + chartHeight / 2;
-      const halfHeight = chartHeight / 2;
+      const maxValue = Math.max(...values, 1);
+      const minValue = Math.min(...values, 0);
 
       const points = values.map((value, index) => {
         const x =
@@ -3410,10 +3836,12 @@
           (index / Math.max(values.length - 1, 1)) *
           (width - paddingX * 2);
 
-        const y =
-          zeroY -
-          (value / niceMax) *
-          halfHeight;
+        const y = chartMode === "balance"
+          ? paddingTop + chartHeight -
+            ((value - minValue) / Math.max(maxValue - minValue, 1)) * chartHeight
+          : (paddingTop + chartHeight / 2) -
+            (value / Math.max(Math.max(...values.map(v => Math.abs(v)), 1) * 1.18, 1)) *
+            (chartHeight / 2);
 
         return {
           x,
@@ -3426,6 +3854,14 @@
       chartPoints = points;
 
       /* horizontal guides + zero line */
+
+      const earningsMaxAbs = Math.max(
+        ...values.map(value => Math.abs(value)),
+        1
+      );
+      const zeroY = chartMode === "balance"
+        ? paddingTop + chartHeight
+        : paddingTop + chartHeight / 2;
 
       ctx.save();
       ctx.lineWidth = 1;
@@ -3892,6 +4328,7 @@
       setupInstallBanner();
       setupServiceWorker();
       setupChartEvents();
+      setChartMode("earnings");
 
       /* Default starter quote */
       if (!state.quotes.length) {
